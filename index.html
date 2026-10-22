@@ -1,0 +1,1986 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>界面模式图鉴</title>
+<meta name="description" content="25 个界面模式的中文图鉴：每个概念都有可交互的真实演示，以及和邻近概念的区分要点。">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="forms.css">
+</head>
+<body>
+
+<!-- 图标精灵 -->
+<svg width="0" height="0" aria-hidden="true" style="position:absolute">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M4.5 12.5l5 5L19.5 7"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v6"/><circle cx="12" cy="16.6" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5"/><circle cx="12" cy="7.6" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.5L21.5 20H2.5z"/><path d="M12 9v5"/><circle cx="12" cy="16.8" r=".9" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 9a6 6 0 1112 0c0 4 1.5 5.5 1.5 5.5h-15S6 13 6 9z"/><path d="M9.8 18a2.4 2.4 0 004.4 0"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.4" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A1.5 1.5 0 014.5 6h4l2 2.5h9A1.5 1.5 0 0121 10v8a1.5 1.5 0 01-1.5 1.5h-15A1.5 1.5 0 013 18z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9.5 7V4.8h5V7M6.5 7l.9 12.2h9.2L17.5 7"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="1.6"/><path d="M15.5 8.5v-3a1 1 0 00-1-1h-9a1 1 0 00-1 1v9a1 1 0 001 1h3"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20l.9-4.2L16.4 4.3a1.7 1.7 0 012.4 0l.9.9a1.7 1.7 0 010 2.4L8.2 19.1z"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10.5l4 4 4-4"/><path d="M4.5 19h15"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M4.5 12h2M17.5 12h2M6.7 6.7l1.4 1.4M15.9 15.9l1.4 1.4M17.3 6.7l-1.4 1.4M8.1 15.9l-1.4 1.4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"/><path d="M4.8 20a7.4 7.4 0 0114.4 0"/></symbol>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="14" rx="1.8"/><circle cx="9" cy="10" r="1.5"/><path d="M4.5 17l4.6-4.3 3 2.8 3.2-3.4 4.2 4.4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 15V4"/><path d="M8.5 7.5L12 4l3.5 3.5"/><path d="M5 13v6.5h14V13"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 4l2.4 5 5.6.7-4 3.9 1 5.4-5-2.7-5 2.7 1-5.4-4-3.9 5.6-.7z"/></symbol>
+  <symbol id="i-empty" viewBox="0 0 64 64"><rect x="9" y="16" width="46" height="34" rx="4" fill="none" stroke="#c2ccd5" stroke-width="1.6"/><path d="M9 24h46" stroke="#c2ccd5" stroke-width="1.6"/><circle cx="15" cy="20" r="1.4" fill="#c2ccd5"/><circle cx="20" cy="20" r="1.4" fill="#c2ccd5"/><path d="M25 40h14M32 33v14" stroke="#dbe2e8" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+
+<header class="masthead">
+  <div class="masthead__title">界面模式图鉴<span>UI Patterns</span></div>
+  <nav class="volsw" aria-label="卷别">
+    <button class="volsw__btn is-on" data-vol="overlay">卷一 · 浮层</button>
+    <button class="volsw__btn" data-vol="form">卷二 · 表单<span class="volsw__long">与输入</span></button>
+  </nav>
+  <div class="search">
+    <svg><use href="#i-search"/></svg>
+    <input type="search" id="search" placeholder="搜索 toast、遮罩、确认…" aria-label="搜索概念">
+  </div>
+  <div class="masthead__count" id="count"></div>
+</header>
+
+<div class="shell">
+
+  <nav class="index" id="index" aria-label="概念索引"></nav>
+
+  <main class="main">
+
+    <!-- ======================= 卷一 · 浮层 ======================= -->
+    <div class="volume" id="vol-overlay">
+
+    <section class="lede" data-vol="overlay">
+      <h1>这些浮层到底<br>什么时候用。</h1>
+      <p>Toast 和 Snackbar 差在哪，Popover 为什么不能放按钮，Alert Dialog 和 Popconfirm 什么时候该用哪个。每个词配一个能真的点开、能关掉的演示 —— 不是截图。看完应该能记住手感，而不只是记住名字。</p>
+      <div class="lede__note">
+        <span><b>25</b> 个概念</span>
+        <span><b>每一个</b>都能点开</span>
+        <span>都标了它和邻居的区别</span>
+      </div>
+    </section>
+
+    <!-- ===================== 提示与反馈 ===================== -->
+
+    <article class="spec" id="toast" data-k="toast 吐司 轻提示 提示 成功 message">
+      <div>
+        <h2 class="spec__en">Toast</h2>
+        <p class="spec__zh">吐司 / 轻提示</p>
+        <p class="spec__one">自动消失，不打断任何操作</p>
+        <p class="spec__def">浮在界面上层的一小块短提示，出现两到三秒后自己消失。不抢焦点，不需要用户回应，背后的页面照样能点。最常见的用法是给刚刚完成的动作一句确认：「已保存」「已复制」。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Snackbar 的区别是「有没有动作」：Toast 只是一句话；Snackbar 专门为「撤销」这类单按钮设计，更宽、停留更久，通常贴在底部横跨。和 Notification 的区别是「要不要读」：Toast 一行字扫过就够，Notification 有标题和正文，等你处理。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#snackbar">Snackbar</a><a href="#notification">Notification</a><a href="#inline-alert">Inline alert</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>message</code></li><li>Radix / shadcn：<code>Toast</code>、<code>sonner</code></li><li>Android 系统：<code>Toast</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="status"</code> 加 <code>aria-live="polite"</code>，读屏会念但不打断。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">动作成功了，但用户不需要为此做任何事。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-toast">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">点一下按钮，注意计时条走完它就消失</p>
+              <div class="demo-row">
+                <button class="btn" data-toast="ok" data-msg="已保存">保存</button>
+                <button class="btn btn--ghost" data-toast="ok" data-msg="已复制到剪贴板">复制</button>
+                <button class="btn btn--ghost" data-toast="warn" data-msg="网络不稳定，正在重试">模拟告警</button>
+              </div>
+            </div>
+          </div>
+          <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="false"></div>
+          <div class="stage__tag">SCREEN CORNER</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="snackbar" data-k="snackbar 底部提示 撤销 undo material">
+      <div>
+        <h2 class="spec__en">Snackbar</h2>
+        <p class="spec__zh">底部横条 / 可撤销提示</p>
+        <p class="spec__one">底部一条，带一个操作按钮</p>
+        <p class="spec__def">从屏幕底部横着推出来的一条窄条，除掉一句话，右侧通常固定放一个操作，比如「撤销」。停留时间比 Toast 长（四到十秒），因为它要留给用户反应和点按钮的时间。是 Material Design 里专门为「我刚做了件可能后悔的事」准备的。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>Snackbar 与 Toast 的关键差别不是位置，是「可操作性」：Snackbar 提供的是一个补救动作，点「撤销」就回滚；Toast 点不了。Snackbar 与 Banner 的差别是「在不在文档流里」：Snackbar 浮在底部盖住内容，Banner 在页面顶部把内容往下推。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#toast">Toast</a><a href="#banner">Banner</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>MUI：<code>Snackbar</code></li><li>Material 3：<code>Snackbar</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">用 <code>aria-live="polite"</code>；有操作时需给足停留时间，键盘可达。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">删除、归档、移走 —— 有可逆余地的破坏性操作。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-snackbar">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">删除后会给你几秒钟撤回</p>
+              <div class="demo-row" id="snackItems">
+                <div class="item-list">
+                  <div class="item-list__row"><span class="item-dot"></span>季度报告.pdf</div>
+                  <div class="item-list__row"><span class="item-dot"></span>会议纪要.md</div>
+                </div>
+              </div>
+              <button class="btn btn--ghost btn--danger" id="snackDelete">删除选中项</button>
+            </div>
+          </div>
+          <div id="snackRegion"></div>
+          <div class="stage__tag">BOTTOM BAR</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="inline-alert" data-k="inline alert 内联提示 表单错误 警告 提示块">
+      <div>
+        <h2 class="spec__en">Inline alert</h2>
+        <p class="spec__zh">内联提示 / 行内警告</p>
+        <p class="spec__one">长在内容里，不会浮起来</p>
+        <p class="spec__def">嵌在页面内容流中的一个色块，带图标和说明文字。它就待在自己该在的位置：表单出错时出现在出错字段旁边，说明性提示放在相关段落下。因为占据文档流的位置，它不会挡住任何东西，也不会自己消失 —— 只有当条件解除时才该移除。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Toast 的差别是「归属」：Toast 属于整个应用，浮在最上层；Inline alert 属于它所在的那块内容，滚走了就看不到。和 Banner 的差别是「范围」：Banner 是全局的、横跨整个视口；Inline alert 只在某个局部生效，可能一屏里有三个。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#toast">Toast</a><a href="#banner">Banner</a><a href="#empty-state">Empty state</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>Alert</code></li><li>Bootstrap：<code>.alert</code></li><li>shadcn：<code>Alert</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">错误用 <code>role="alert"</code>；普通说明用 <code>role="status"</code>。别用颜色当唯一信号。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">信息必须和某块内容一起被看到，或者用户得改点什么才能继续。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-inline">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <form class="form-mock" id="inlineForm" novalidate>
+                <div class="field">
+                  <label for="email">邮箱</label>
+                  <input type="text" id="email" placeholder="you@example.com" autocomplete="off">
+                </div>
+                <div id="inlineSlot"></div>
+                <button class="btn" type="submit">订阅周报</button>
+              </form>
+            </div>
+          </div>
+          <div class="stage__tag">IN FLOW</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="banner" data-k="banner 横幅 公告 顶部通知 cookie">
+      <div>
+        <h2 class="spec__en">Banner</h2>
+        <p class="spec__zh">横幅 / 全局公告</p>
+        <p class="spec__one">横跨整页顶部，常驻到被关掉</p>
+        <p class="spec__def">页面最顶端一条贯穿全宽的横条，用来讲一件影响所有人的事：服务维护、账单异常、试用快到期、Cookie 同意。它把页面内容整体往下推，而不是盖住内容。通常一直存在，直到用户主动关闭或者状态改变。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Inline alert 的差别是「作用域」：Banner 属于整个应用或整个页面，只能有一条；Inline alert 属于某个模块，可以同时存在多条。和 Snackbar 的差别是「是否占位」：Banner 占空间、会推动布局，Snackbar 悬浮覆盖在内容之上。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#inline-alert">Inline alert</a><a href="#snackbar">Snackbar</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>MUI：<code>Alert</code> 配 <code>variant="standard"</code></li><li>多数产品自研，无统一 API</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">放在 DOM 最前，保证 Tab 顺序先到；关闭按钮要有明确的 <code>aria-label</code>。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">这件事对每个用户都成立，而且不看到会出问题。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-banner">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="page-mock">
+              <div id="bannerSlot">
+                <div class="banner">
+                  <span class="banner__text">服务将于今晚 23:00 进行维护，预计 30 分钟。<a class="banner__link">查看详情</a></span>
+                  <button class="banner__close" id="bannerClose" aria-label="关闭公告">&times;</button>
+                </div>
+              </div>
+              <div class="mock-page">
+                <div class="sk sk--title"></div>
+                <div class="sk sk--line"></div>
+                <div class="sk sk--line"></div>
+                <div class="sk sk--block"></div>
+              </div>
+            </div>
+            <div style="padding:0 20px 16px">
+              <button class="btn btn--ghost btn--sm" id="bannerReset">重新显示公告</button>
+            </div>
+          </div>
+          <div class="stage__tag">PAGE TOP</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="notification" data-k="notification 通知 右上角 消息 卡片">
+      <div>
+        <h2 class="spec__en">Notification</h2>
+        <p class="spec__zh">通知卡片</p>
+        <p class="spec__one">堆在角落里，等你有空读</p>
+        <p class="spec__def">从屏幕一角（通常是右上）滑入的卡片，比 Toast 大得多：有图标、标题、一行描述、可选的操作按钮。可以堆叠好几条，不会几秒就消失，需要用户关掉或者点进去。适合「值得知道，但不急着处理」的事件 —— 收到新消息、后台任务跑完了、有人提及了你。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Toast 的差别是「分量」：Toast 是一句扫一眼就过的话，Notification 是一张带标题和正文的卡片，能容纳决策。和 Modal 的差别是「阻不阻断」：Notification 不挡操作，Modal 要求你先处理它。系统级的推送通知（iOS / Android 通知中心）是另一回事，那个在应用之外。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#toast">Toast</a><a href="#modal">Modal</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>notification</code></li><li>多数库叫 <code>Notification</code> 或 <code>Toaster</code> 的富变体</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">容器用 <code>aria-live="polite"</code>；每条要有可读的标题，关闭按钮单独可聚焦。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">用户不在看那一块，但这件事需要他知道，而且晚点处理也没问题。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-notif">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">点一下，看它滑进来并停住</p>
+              <button class="btn" id="notifAdd">收到一条新消息</button>
+              <button class="btn btn--ghost btn--sm" id="notifClear">清空</button>
+            </div>
+          </div>
+          <div class="notif-region" id="notifRegion" aria-live="polite"></div>
+          <div class="stage__tag">CORNER STACK</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="badge" data-k="badge 徽标 角标 未读数 红点">
+      <div>
+        <h2 class="spec__en">Badge</h2>
+        <p class="spec__zh">徽标 / 角标</p>
+        <p class="spec__one">贴在图标上的数字或圆点</p>
+        <p class="spec__def">附着在图标、头像、标签右上角的一个小标记：一个数字表示未读数量，一个圆点表示「有更新」。它不是临时的 —— 只要状态还在，它就一直亮着，会随着状态消失而消失。所以它是状态的一部分，而不是一次事件提示。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Toast 的差别是「持续性」：Toast 是一次性的消息，看完就走；Badge 是持续存在的状态标记，用来告诉你「这里还有东西」。和 Tooltip 无关，但常一起出现 —— Badge 吸引注意，Tooltip 解释含义。数字超过 99 通常显示 <code>99+</code>，不要让它撑破布局。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#toast">Toast</a><a href="#notification">Notification</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>Badge</code></li><li>MUI：<code>Badge</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">数字本身对读屏无意义，要在宿主元素上给 <code>aria-label="通知，3 条未读"</code>。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">用户不在那一页，也需要知道那边有变化。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-badge">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">点图标清零，点按钮加一</p>
+              <div class="demo-row" style="gap:26px">
+                <button class="badge-host" id="badgeBell" aria-label="通知">
+                  <svg><use href="#i-bell"/></svg>
+                  <span class="badge" id="badgeNum">3</span>
+                </button>
+                <span class="badge-host" style="cursor:default" aria-label="收藏，有新内容">
+                  <svg><use href="#i-star"/></svg>
+                  <span class="badge badge--dot" aria-hidden="true"></span>
+                </span>
+                <span class="badge-host" style="cursor:default" aria-label="草稿">
+                  <svg><use href="#i-folder"/></svg>
+                  <span class="badge badge--muted">12</span>
+                </span>
+              </div>
+              <button class="btn btn--ghost btn--sm" id="badgeAdd">收到新通知</button>
+            </div>
+          </div>
+          <div class="stage__tag">ON ICON</div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================== 加载与空态 ===================== -->
+
+    <article class="spec" id="skeleton" data-k="skeleton 骨架屏 占位 加载 shimmer">
+      <div>
+        <h2 class="spec__en">Skeleton</h2>
+        <p class="spec__zh">骨架屏</p>
+        <p class="spec__one">用灰块先把布局占住</p>
+        <p class="spec__def">在内容到达之前，用灰色方块按真实布局的形状铺出来，带一点微弱的流动光。它的价值不在「转圈告诉你在加载」，而在「提前把位置占好」—— 内容是原地长出来的，页面不会在数据到达的瞬间整体跳一下。用在结构已知、只是数据没到的场合。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Spinner 的差别是「知不知道长什么样」：Spinner 只知道「在等」，Skeleton 知道要等出来的是列表还是卡片，所以能画出形状。经验规则：首屏内容用 Skeleton，局部小操作（按钮提交、下拉刷新）用 Spinner。别把 Skeleton 做得比真实内容更漂亮，否则加载完成反而是个失望。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#spinner">Spinner</a><a href="#progress">Progress</a><a href="#empty-state">Empty state</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>MUI：<code>Skeleton</code></li><li>Ant Design：<code>Skeleton</code></li><li>shadcn：<code>Skeleton</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">容器标 <code>aria-busy="true"</code>，并对读屏隐藏灰块本身；<code>prefers-reduced-motion</code> 下停掉流光。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">首屏或列表第一次加载，且能预判内容的形状。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-skeleton">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="skeleton-list" id="skelList"></div>
+              <button class="btn btn--ghost btn--sm" id="skelReload">重新加载</button>
+            </div>
+          </div>
+          <div class="stage__tag">PLACEHOLDER</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="spinner" data-k="spinner 加载中 转圈 loading 菊花">
+      <div>
+        <h2 class="spec__en">Spinner</h2>
+        <p class="spec__zh">加载指示器 / 转圈</p>
+        <p class="spec__one">我不知道还要多久</p>
+        <p class="spec__def">一个不停旋转的圆环，表示「正在进行，进度未知」。它不占具体位置，可以塞进按钮里、表格单元格里、页面正中。它的潜台词是「很快」，所以只适合一两秒内结束的等待 —— 超过几秒，用户会开始怀疑是不是卡死了。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Progress 的差别是「有没有可测量的进度」：能算出百分比（上传、安装）就用 Progress，算不出来（等接口返回）才用 Spinner。和 Skeleton 的差别是「是否保留布局」：Spinner 会让内容区域塌成一个小圆，Skeleton 让布局原地不动。等待超过 5 秒，最好在 Spinner 下面补一句「正在加载 128 条记录…」，让人知道它没死。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#progress">Progress</a><a href="#skeleton">Skeleton</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>MUI：<code>CircularProgress</code></li><li>Ant Design：<code>Spin</code></li><li>Bootstrap：<code>.spinner-border</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="status"</code> 加一段视觉隐藏的「加载中」文本，别只靠图形。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">局部、短暂、无法预估进度的等待。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-spinner">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">按钮内的 Spinner 是原地替换文案，不新增一条提示</p>
+              <div class="demo-row">
+                <button class="btn" id="spinBtn"><span id="spinBtnText">拉取数据</span></button>
+                <button class="btn btn--ghost" id="spinBtn2"><span class="inline-loading" id="spinInline" hidden><span class="spinner spinner--sm"></span>同步中</span><span id="spinInlineIdle">同步账户</span></button>
+              </div>
+              <div style="height:22px;display:grid;place-items:center" id="spinCenter"></div>
+            </div>
+          </div>
+          <div class="stage__tag">INLINE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="progress" data-k="progress 进度条 上传 百分比 确定性">
+      <div>
+        <h2 class="spec__en">Progress</h2>
+        <p class="spec__zh">进度条</p>
+        <p class="spec__one">能算出百分比，就别让用户猜</p>
+        <p class="spec__def">一条填充的横条（或圆环），表示已经完成了多少。分两种：确定型（有真实百分比，跟着任务推进）和不确定型（来回反复，本质是横着放的 Spinner）。文件上传、批量导入、安装、多步表单里都该用它，因为知道「还剩多少」能显著降低等待的焦虑。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Spinner 的差别只在「进度是否可知」，但用户体感差别很大：进度条会让人愿意等更久。别做假的进度条 —— 那种每次走到 90% 就卡住的，比没有进度更让人恼火。不确定型的 Progress 和 Spinner 功能重复，二选一就行，不要同时出现。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#spinner">Spinner</a><a href="#skeleton">Skeleton</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>Progress</code></li><li>MUI：<code>LinearProgress</code></li><li>shadcn：<code>Progress</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="progressbar"</code> 加 <code>aria-valuenow/min/max</code>；不确定型不要给 <code>valuenow</code>。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">任务有可测量的完成度，或者会超过两三秒。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-progress">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="progress-group">
+                <div>
+                  <div class="progress-item__head"><span>正在上传 design-system.zip</span><b id="progPct">0%</b></div>
+                  <div class="track"><div class="bar" id="progBar"></div></div>
+                </div>
+                <div>
+                  <div class="progress-item__head"><span>正在建立索引</span><b style="color:var(--ink-3);font-size:11px">不确定</b></div>
+                  <div class="track"><div class="bar bar--indeterminate"></div></div>
+                </div>
+              </div>
+              <div class="demo-row">
+                <button class="btn" id="progStart">开始上传</button>
+                <button class="btn btn--ghost btn--sm" id="progReset">重置</button>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">DETERMINATE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="empty-state" data-k="empty state 空状态 无数据 空白 引导">
+      <div>
+        <h2 class="spec__en">Empty state</h2>
+        <p class="spec__zh">空状态</p>
+        <p class="spec__one">没有数据时，告诉人下一步做什么</p>
+        <p class="spec__def">当列表、搜索结果、收件箱里什么都没有时，占据那块区域的说明：一张小插图、一句话解释为什么空、一个明确的按钮。空白屏幕是最糟的界面，因为它让人分不清「加载失败」「我没权限」还是「这里本来就没有东西」。空状态的任务是把这句话说清楚，并递出一个动作。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Skeleton 的差别是「会不会有东西」：Skeleton 是「还没来」，Empty state 是「确实没有」。这两种状态必须严格分开 —— 把加载中的空列表渲染成「暂无数据」，是新手最常犯的错误之一。另外要区分「第一次使用」和「筛选后无结果」，前者该鼓励创建，后者该提供「清除筛选」。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#skeleton">Skeleton</a><a href="#inline-alert">Inline alert</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>Empty</code></li><li>多数库无统一组件，按项目自建</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">标题用真实标题层级，插图 <code>aria-hidden="true"</code>；说明文字要在 DOM 里而不是图里。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">任何「查无内容」的容器，包括搜索结果和筛选结果。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-empty">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center" id="emptySlot">
+              <div class="empty">
+                <svg aria-hidden="true"><use href="#i-empty"/></svg>
+                <p class="empty__title">还没有项目</p>
+                <p class="empty__desc">项目用来把相关的文件、成员和部署放在一起。</p>
+                <button class="btn" id="emptyCreate">新建第一个项目</button>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">NO DATA</div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================== 遮罩层 ===================== -->
+
+    <article class="spec" id="modal" data-k="modal 模态框 弹窗 dialog 遮罩">
+      <div>
+        <h2 class="spec__en">Modal</h2>
+        <p class="spec__zh">模态框 / 弹窗</p>
+        <p class="spec__one">居中浮起，后面的页面暂时不能用</p>
+        <p class="spec__def">一层半透明遮罩盖住页面，中间浮出一个对话框。它是一个「次级任务」的容器：编辑一条记录、选一个文件、填一段说明。打开期间焦点被锁在框内，Tab 不会跑出去，Esc 或点遮罩可以关掉。关掉之后，焦点应该回到当初打开它的那个按钮上。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Alert dialog 的差别是「能不能随便关」：Modal 是常规任务，用户随时可以反悔退出；Alert dialog 是「必须先回答」，点外面和按 Esc 都不该关掉。和 Drawer 的差别是「内容量」：Modal 适合一屏能看完的表单，内容长、需要滚动就换 Drawer。少用 Modal —— 它是打断，用多了用户会烦。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#alert-dialog">Alert dialog</a><a href="#drawer">Drawer</a><a href="#bottom-sheet">Bottom sheet</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>Dialog</code></li><li>Ant Design：<code>Modal</code></li><li>MUI：<code>Dialog</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="dialog"</code> 加 <code>aria-modal="true"</code>，焦点陷阱，Esc 关闭，关闭后焦点归位。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">用户必须完成或放弃某件事，才能继续原来的流程。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-modal">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">试试按 Esc，或者点遮罩</p>
+              <button class="btn" id="modalOpen">编辑项目名</button>
+            </div>
+          </div>
+          <div class="scrim" id="modalScrim"></div>
+          <div class="dialog" id="modalBox" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div class="dialog__head" id="modalTitle">编辑项目名</div>
+            <div class="dialog__body">
+              <div class="field">
+                <label for="projName">名称</label>
+                <input id="projName" value="design-system" autocomplete="off">
+              </div>
+            </div>
+            <div class="dialog__foot">
+              <button class="btn btn--ghost btn--sm" data-close="modal">取消</button>
+              <button class="btn btn--sm" data-close="modal">保存</button>
+            </div>
+          </div>
+          <div class="stage__tag">CENTERED</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="alert-dialog" data-k="alert dialog 警告框 确认 危险操作 删除 confirm">
+      <div>
+        <h2 class="spec__en">Alert dialog</h2>
+        <p class="spec__zh">警告对话框</p>
+        <p class="spec__one">必须先回答，不能点外面溜走</p>
+        <p class="spec__def">一种特殊的 Modal，唯一目的是让用户对一件有后果的事做明确选择：真的要删除吗、要放弃未保存的修改吗、要覆盖这个文件吗。它刻意不提供「随便关掉」的出口 —— 点遮罩没用，Esc 也不该关，必须点「取消」或「确认」。这是把「确认」变成无法回避的一步。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和普通 Modal 的差别是「是否有退路」：Modal 允许随意退出，Alert dialog 强制二选一。和 Popconfirm 的差别是「分量」：Popconfirm 是就地一个小气泡，适合「移到回收站」这种能撤销的日常操作；Alert dialog 是整屏遮罩，留给不可逆的高危操作。别为了小事用 Alert dialog —— 它一出现就在喊「注意」，喊多了就没人听了。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#modal">Modal</a><a href="#popconfirm">Popconfirm</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>AlertDialog</code></li><li>Ant Design：<code>Modal.confirm</code></li><li>ARIA 规范：<code>role="alertdialog"</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="alertdialog"</code>，初始焦点放在「取消」上；不响应遮罩点击和 Esc。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">操作不可逆，或者会损失数据。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-alert">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">按 Esc 或点遮罩都关不掉 —— 这正是它的设计</p>
+              <button class="btn btn--danger" id="alertOpen">删除这个仓库</button>
+              <p id="alertResult" style="font-size:12.5px;color:var(--ink-3);height:18px"></p>
+            </div>
+          </div>
+          <div class="scrim" id="alertScrim"></div>
+          <div class="dialog dialog--danger" id="alertBox" role="alertdialog" aria-modal="true" aria-labelledby="alertTitle" aria-describedby="alertDesc">
+            <div class="dialog__icon-danger"><svg style="width:17px;height:17px;stroke:var(--danger);fill:none;stroke-width:2"><use href="#i-trash"/></svg></div>
+            <div class="dialog__head" id="alertTitle">删除「design-system」？<span class="esc-note">ESC 无效</span></div>
+            <div class="dialog__body" id="alertDesc">这个仓库里的 48 个文件和 12 次部署记录会被永久删除，无法恢复。</div>
+            <div class="dialog__foot">
+              <button class="btn btn--ghost btn--sm" data-close="alert">取消</button>
+              <button class="btn btn--danger btn--sm" id="alertConfirm">永久删除</button>
+            </div>
+          </div>
+          <div class="stage__tag">NOT DISMISSIBLE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="drawer" data-k="drawer 抽屉 侧边栏 面板 offcanvas">
+      <div>
+        <h2 class="spec__en">Drawer</h2>
+        <p class="spec__zh">抽屉</p>
+        <p class="spec__one">从侧边滑出，装得下长内容</p>
+        <p class="spec__def">从屏幕侧边（多数在右边）滑进来的一块面板，通常是满高的。它和 Modal 做同样的事 —— 承载一个次级任务 —— 但能装下更多东西：一长串设置项、一条记录的完整详情、一个筛选面板。宽度可比 Modal 大，内容超出就自己滚动，而且滑出的动作本身就在告诉用户「这是从旁边推过来的，不是替换了当前页面」。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Modal 的差别是「体量」：内容短、要聚焦就用 Modal；内容长、要滚动就用 Drawer。和 Bottom sheet 的差别是「方向与设备」：Drawer 通常从侧边来，桌面端常见；Bottom sheet 从底边来，移动端常见。还有一点容易漏：Drawer 打开时背景依然可见，但同样要锁焦点。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#modal">Modal</a><a href="#bottom-sheet">Bottom sheet</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>Drawer</code></li><li>MUI：<code>Drawer</code></li><li>shadcn：<code>Sheet</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="dialog"</code>，焦点陷阱，Esc 关闭，关闭后焦点归位。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">内容比一个对话框多，但还没多到值得单独开一页。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-drawer">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">点遮罩或 Esc 都能关</p>
+              <button class="btn" id="drawerOpen">打开项目设置</button>
+            </div>
+          </div>
+          <div class="scrim" id="drawerScrim"></div>
+          <aside class="drawer" id="drawerBox" role="dialog" aria-modal="true" aria-label="项目设置">
+            <div class="drawer__head">
+              项目设置
+              <button class="icon-btn" data-close="drawer" aria-label="关闭">&times;</button>
+            </div>
+            <div class="drawer__body">
+              <div class="field" style="margin-bottom:14px">
+                <label for="drawerName">项目名</label>
+                <input id="drawerName" value="design-system">
+              </div>
+              <div class="field" style="margin-bottom:14px">
+                <label for="drawerBranch">默认分支</label>
+                <input id="drawerBranch" value="main">
+              </div>
+              <div class="field" style="margin-bottom:14px">
+                <label for="drawerDom">自定义域名</label>
+                <input id="drawerDom" value="ds.example.com">
+              </div>
+              <p style="font-size:12px;line-height:1.7;color:var(--ink-3)">内容偏长、需要滚动的场景，就是抽屉该出场的时候；同样的事塞进居中弹窗会显得很挤。</p>
+            </div>
+            <div class="dialog__foot" style="border-radius:0">
+              <button class="btn btn--ghost btn--sm" data-close="drawer">取消</button>
+              <button class="btn btn--sm" data-close="drawer">保存</button>
+            </div>
+          </aside>
+          <div class="stage__tag">FROM RIGHT</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="bottom-sheet" data-k="bottom sheet 底部面板 半屏 移动端">
+      <div>
+        <h2 class="spec__en">Bottom sheet</h2>
+        <p class="spec__zh">底部面板</p>
+        <p class="spec__one">从底边升起，可以拖着走</p>
+        <p class="spec__def">从屏幕底边滑上来的面板，顶上有一道小横条提示「可以拖」。它可以是半屏（露出后面的地图或列表），也可以拖到全屏。移动端的主力容器：点一个地点弹出详情、点评论弹出评论区、点筛选弹出选项。和 Drawer 一样承载任意内容，只是从下往上。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Action sheet 的差别是「内容自由度」：Action sheet 只放一排动作按钮，结构固定；Bottom sheet 里可以是一张卡片、一个表单、一整个页面。和 Modal 的差别是「手势」：Bottom sheet 靠下拖关闭，符合拇指够得着的区域，这在手机上比右上角的关闭按钮友好得多。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#action-sheet">Action sheet</a><a href="#drawer">Drawer</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Material 3：<code>BottomSheet</code></li><li>shadcn：<code>Drawer</code>（基于 Vaul）</li><li>iOS：无内置，常自建</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="dialog"</code>，焦点陷阱；拖动必须同时提供按钮关闭，别只靠手势。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">移动端需要一个不离开当前场景的次级面板。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-sheet">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">下拖或点遮罩收起</p>
+              <button class="btn" id="sheetOpen">查看地点详情</button>
+            </div>
+          </div>
+          <div class="scrim" id="sheetScrim"></div>
+          <div class="sheet" id="sheetBox" role="dialog" aria-modal="true" aria-label="地点详情">
+            <div class="sheet__grab"></div>
+            <div class="sheet__body">
+              <p class="sheet__title">筑地本愿寺</p>
+              <p class="sheet__desc">东京都中央区。营业至 17:00，距当前位置 1.2 公里。</p>
+              <div class="sheet__rows">
+                <div class="sheet__row"><svg style="width:15px;height:15px;stroke:var(--ink-3);fill:none;stroke-width:1.6"><use href="#i-star"/></svg>收藏</div>
+                <div class="sheet__row"><svg style="width:15px;height:15px;stroke:var(--ink-3);fill:none;stroke-width:1.6"><use href="#i-share"/></svg>分享</div>
+                <div class="sheet__row"><svg style="width:15px;height:15px;stroke:var(--ink-3);fill:none;stroke-width:1.6"><use href="#i-download"/></svg>离线保存</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">FROM BOTTOM</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="action-sheet" data-k="action sheet 动作面板 操作表 ios 分享">
+      <div>
+        <h2 class="spec__en">Action sheet</h2>
+        <p class="spec__zh">动作面板 / 操作表</p>
+        <p class="spec__one">底部一列按钮，最后一定有取消</p>
+        <p class="spec__def">iOS 的经典形态：从底部升起一组大按钮，每个代表一个动作，最后单独隔开放一个「取消」。它不承载内容，只承载选择。触发场景往往是长按或点「⋯」：分享到哪儿、用哪个应用打开、要编辑还是要删除。危险动作（删除）会被标成红色，并和普通动作分开。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Bottom sheet 的差别是「有没有别的可能」：Action sheet 的答案注定在这一列按钮里，所以「取消」必须存在；Bottom sheet 是容器，里面放什么都行。和 Dropdown menu 的差别是「设备与位置」：同样的动作列表，桌面端用下拉菜单贴着按钮，手机端用动作面板从底部升起，因为拇指在下面。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#bottom-sheet">Bottom sheet</a><a href="#dropdown-menu">Dropdown menu</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>iOS：<code>UIAlertController</code>（<code>.actionSheet</code>）</li><li>Android：常对应 <code>ModalBottomSheet</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">每个动作都是按钮，取消按钮必须可聚焦；不要只靠颜色区分破坏性动作。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">移动端，让用户从几个互斥动作里挑一个。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-action">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">注意「取消」是独立的一组</p>
+              <button class="btn" id="actionOpen">分享这张照片</button>
+            </div>
+          </div>
+          <div class="scrim" id="actionScrim"></div>
+          <div class="action-sheet" id="actionBox" role="dialog" aria-modal="true" aria-label="分享选项">
+            <div class="action-sheet__group">
+              <div class="action-sheet__title">保存或分享</div>
+              <button class="action-sheet__item" data-action="存到相册">存到相册</button>
+              <button class="action-sheet__item" data-action="复制链接">复制链接</button>
+              <button class="action-sheet__item" data-action="发送给朋友">发送给朋友</button>
+              <button class="action-sheet__item action-sheet__item--destructive" data-action="删除照片">删除照片</button>
+            </div>
+            <button class="action-sheet__cancel" data-close="action">取消</button>
+          </div>
+          <div class="stage__tag">IOS STYLE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="lightbox" data-k="lightbox 灯箱 图片查看 全屏 画廊">
+      <div>
+        <h2 class="spec__en">Lightbox</h2>
+        <p class="spec__zh">灯箱 / 图片查看器</p>
+        <p class="spec__one">黑底全屏，只为看图</p>
+        <p class="spec__def">点开图片后铺满整个视口的浮层，背景压到接近纯黑，图片居中放大，两侧可切换上一张下一张，角上有关闭。它把周围一切无关的东西都去掉，因为此时用户唯一想做的就是看清这张图。常见的配套是缩略图条、「3 / 12」这样的位置提示，以及左右方向键。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Modal 的差别是「容器性质」：Modal 是白色对话框，装表单和决策；Lightbox 是暗色媒体查看器，装的是图片和视频，没有操作按钮。和 Bottom sheet 无关，但经常被误当成「图片放大」的通用方案 —— 如果只是想让缩略图变大一点，不该上灯箱，那太重的打断了。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#modal">Modal</a><a href="#drawer">Drawer</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>PhotoSwipe、Fancybox（独立库）</li><li>Ant Design：<code>Image.PreviewGroup</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="dialog"</code>；左右键切换、Esc 关闭；图片要有 <code>alt</code>，并说明这是第几张。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">用户明确要看大图，且周围上下文此时不重要。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-lightbox">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">点开后可左右切换，Esc 关闭</p>
+              <div class="thumbs" id="thumbStrip"></div>
+            </div>
+          </div>
+          <div class="lightbox" id="lbOverlay" role="dialog" aria-modal="true" aria-label="图片查看器">
+            <button class="lightbox__close" id="lbClose" aria-label="关闭">&times;</button>
+            <button class="lightbox__nav lightbox__nav--prev" id="lbPrev" aria-label="上一张">&#8249;</button>
+            <img class="lightbox__img" id="lbImg" alt="">
+            <button class="lightbox__nav lightbox__nav--next" id="lbNext" aria-label="下一张">&#8250;</button>
+            <div class="lightbox__count" id="lbCount">1 / 3</div>
+          </div>
+          <div class="stage__tag">FULLSCREEN MEDIA</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="command-palette" data-k="command palette 命令面板 cmd k 全局搜索 快捷">
+      <div>
+        <h2 class="spec__en">Command palette</h2>
+        <p class="spec__zh">命令面板</p>
+        <p class="spec__one">一个输入框，找到任何功能</p>
+        <p class="spec__def">按 <kbd>⌘K</kbd>（Windows 上是 <kbd>Ctrl K</kbd>）唤起的全局面板：一个输入框，下面一列可执行的动作和可跳转的对象，边打字边过滤，上下键选，回车执行。它把「翻三级菜单才找到的那个开关」变成「打出两个字」。对熟练用户来说，这是整款产品里最快的路径。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Dropdown menu 的差别是「谁决定去哪」：下拉菜单列的是固定的几个选项，命令面板是在整个应用里搜。和普通搜索框的差别是「结果不只是内容，还有动作」—— 搜「深色」应该能直接切主题，而不只是搜到一篇讲深色模式的文档。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#dropdown-menu">Dropdown menu</a><a href="#modal">Modal</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>cmdk、kbar（独立库）</li><li>shadcn：<code>Command</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">输入框配 <code>role="combobox"</code>，列表 <code>role="listbox"</code>，用 <code>aria-activedescendant</code> 跟踪高亮项。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">功能很多、层级很深的工具型产品；也适合只服务键盘用户。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-palette">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">在舞台里按 ⌘K / Ctrl K，或者直接点按钮</p>
+              <button class="btn" id="paletteOpen">打开命令面板</button>
+              <p id="paletteResult" style="font-size:12.5px;color:var(--ink-3);height:18px"></p>
+            </div>
+          </div>
+          <div class="scrim" id="paletteScrim"></div>
+          <div class="palette" id="paletteBox" role="dialog" aria-modal="true" aria-label="命令面板">
+            <input class="palette__input" id="paletteInput" placeholder="输入命令或搜索…" role="combobox" aria-expanded="true" aria-controls="paletteList" autocomplete="off">
+            <div class="palette__list" id="paletteList" role="listbox"></div>
+            <div class="palette__kbdhint"><span>↑↓ 选择</span><span>↵ 执行</span><span>ESC 关闭</span></div>
+          </div>
+          <div class="stage__tag">KEYBOARD FIRST</div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================== 锚定浮层 ===================== -->
+
+    <article class="spec" id="tooltip" data-k="tooltip 提示 悬浮 悬停 tooltip 黑框">
+      <div>
+        <h2 class="spec__en">Tooltip</h2>
+        <p class="spec__zh">工具提示</p>
+        <p class="spec__one">悬停一下，给个纯文字解释</p>
+        <p class="spec__def">鼠标停在一个元素上（或键盘 Tab 到它）之后，紧挨着弹出的一小块深色标签，通常只有一个词或一句话。它的职责是补充「这个东西是什么」—— 一个只有图标的按钮、一个被截断的文件名、一个术语。里面不能放按钮，不能放链接，因为鼠标一移过去它就消失了。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Popover 的差别是「能不能交互」：Tooltip 是纯文本、不可点击；Popover 可以放表单和按钮。和 Hover card 的差别是「内容量」：Tooltip 是一句说明，Hover card 是一张预览卡（头像、简介、数据），而且会延迟出现让你能移进去。移动端没有悬停，Tooltip 基本不可用 —— 那里的等价物是点击展开，或者干脆把文字写出来。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#popover">Popover</a><a href="#hover-card">Hover card</a><a href="#popconfirm">Popconfirm</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>Tooltip</code></li><li>Ant Design：<code>Tooltip</code></li><li>MUI：<code>Tooltip</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="tooltip"</code>，通过 <code>aria-describedby</code> 关联；键盘聚焦也要触发，Esc 可关。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">信息能用一句话说完，且不看到也不会出事。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-tooltip">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">悬停，或用 Tab 键聚焦</p>
+              <div class="demo-row" style="gap:20px">
+                <span class="tip-anchor" data-tip="撤销上一步（⌘Z）">
+                  <button class="btn btn--ghost btn--sm" aria-describedby="tip1">撤销</button>
+                  <span class="tooltip" id="tip1" role="tooltip">撤销上一步（⌘Z）</span>
+                </span>
+                <span class="tip-anchor" data-tip="只有 24 小时内可以恢复">
+                  <button class="btn btn--ghost btn--sm" aria-describedby="tip2">归档</button>
+                  <span class="tooltip" id="tip2" role="tooltip">只有 24 小时内可以恢复</span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">HOVER / FOCUS</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="popover" data-k="popover 气泡卡片 浮层 弹出">
+      <div>
+        <h2 class="spec__en">Popover</h2>
+        <p class="spec__zh">气泡卡片</p>
+        <p class="spec__one">点一下，弹出一块能操作的浮层</p>
+        <p class="spec__def">锚定在某个元素旁边的一块浮层，由点击触发，里面可以放真正的界面：几个勾选框、一小段设置、一个简短的表单。点浮层外面或者再点一次触发按钮就关掉。它比 Modal 轻 —— 不遮住页面，不锁焦点，用户能一边看着浮层一边看着背后的内容。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Tooltip 的差别是「可交互性」，这是硬性的：Tooltip 里放按钮是错误用法，因为你没法把鼠标移进去。和 Dropdown menu 的差别是「内容的性质」：下拉菜单是一列同质的动作命令，Popover 里可以是任意内容，包括一组开关或者一段说明配一个按钮。和 Popconfirm 的差别是「目的」：Popconfirm 只问「确定吗」，Popover 干什么都行。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#tooltip">Tooltip</a><a href="#dropdown-menu">Dropdown menu</a><a href="#popconfirm">Popconfirm</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>Popover</code></li><li>Ant Design：<code>Popover</code></li><li>Headless UI：<code>Popover</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">触发按钮 <code>aria-expanded</code>，浮层 <code>role="dialog"</code>；Esc 关闭并把焦点还给按钮。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">需要就地调整几个选项，不必离开当前页面。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-popover">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">点按钮展开，点外面收起</p>
+              <span id="popoverAnchor">
+                <button class="btn btn--ghost" id="popoverBtn" aria-expanded="false" aria-haspopup="dialog">
+                  <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7;vertical-align:-2px;margin-right:5px"><use href="#i-settings"/></svg>显示选项
+                </button>
+              </span>
+            </div>
+          </div>
+          <div class="popover" id="popoverBox" role="dialog" aria-label="显示选项">
+            <div class="popover__title">表格里显示</div>
+            <label class="check-row"><input type="checkbox" checked>创建时间</label>
+            <label class="check-row"><input type="checkbox" checked>负责人</label>
+            <label class="check-row"><input type="checkbox">部署状态</label>
+            <label class="check-row"><input type="checkbox">提交次数</label>
+          </div>
+          <div class="stage__tag">CLICK ANCHORED</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="popconfirm" data-k="popconfirm 气泡确认 二次确认 删除">
+      <div>
+        <h2 class="spec__en">Popconfirm</h2>
+        <p class="spec__zh">气泡确认</p>
+        <p class="spec__one">就地弹一句「确定吗」，两个小按钮</p>
+        <p class="spec__def">贴着触发按钮弹出来的小气泡，只有一句问话和一个「取消 / 确定」。它的存在是为了拦住一次误点，而不是为了强调这件事有多严重。因为位置就在原来那个按钮旁边，用户的视线不用移动，确认或取消都只多一次点击。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Alert dialog 的差别是「代价」：Popconfirm 让用户多花半秒，Alert dialog 让整个屏幕停下来。判断标准是操作能不能挽回 —— 能撤销的删除、清空筛选、离开未保存的页面，用 Popconfirm 就够；删了整个工作区、覆盖生产数据库，才值得上 Alert dialog。别给每个删除都套大弹窗，那会让确认失去意义。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#alert-dialog">Alert dialog</a><a href="#popover">Popover</a><a href="#tooltip">Tooltip</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>Popconfirm</code></li><li>Radix：用 <code>AlertDialog</code> 或 <code>Popover</code> 自行组合</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">浮层 <code>role="alertdialog"</code>，打开时焦点移到「取消」；Esc 等同于取消。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">日常操作里的误点保护，操作本身可挽回。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-popconfirm">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">确认后不会发生什么大事 —— 这正是重点</p>
+              <span id="pcAnchor">
+                <button class="btn btn--ghost" id="pcBtn" aria-haspopup="dialog">移除标签</button>
+              </span>
+              <p id="pcResult" style="font-size:12.5px;color:var(--ink-3);height:18px"></p>
+            </div>
+          </div>
+          <div class="popconfirm" id="pcBox" role="alertdialog" aria-label="确认移除">
+            <p class="popconfirm__msg">移除「已归档」标签？之后可以在设置里重新加上。</p>
+            <div class="popconfirm__foot">
+              <button class="btn btn--ghost btn--sm" data-pc="no">取消</button>
+              <button class="btn btn--sm" data-pc="yes">移除</button>
+            </div>
+          </div>
+          <div class="stage__tag">INLINE CONFIRM</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="hover-card" data-k="hover card 悬停卡片 预览 用户卡片">
+      <div>
+        <h2 class="spec__en">Hover card</h2>
+        <p class="spec__zh">悬停卡片</p>
+        <p class="spec__one">停一下才出现的内容预览</p>
+        <p class="spec__def">鼠标停在用户名或链接上约半秒后，浮出的一张预览卡：头像、简介、粉丝数、关注按钮。关键在两点：有延迟（避免划过时到处弹），以及鼠标能移进卡里（所以里面的按钮可以点）。它取代的是「点进去看一眼再返回」这个来回。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Tooltip 的差别是「内容与交互」：Tooltip 立刻出现、纯文字、移不进去；Hover card 延迟出现、有布局有图片、可以点里面的东西。和 Popover 的差别是「怎么触发」：Popover 靠点击，Hover card 靠悬停 —— 这也意味着它在触屏设备上需要退化成点击，别忘了做这个兜底。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#tooltip">Tooltip</a><a href="#popover">Popover</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>HoverCard</code></li><li>Ant Design：<code>Popover</code> 配 <code>trigger="hover"</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">键盘聚焦也要能打开；卡内若有交互元素，必须能在无鼠标时到达。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">主内容里频繁出现人名或链接，提前预览能省掉一次跳转。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-hover">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">停在名字上别动，约 0.4 秒后出现</p>
+              <p style="font-size:13.5px;line-height:1.9;max-width:340px;color:var(--ink-2)">
+                这条设计规范由 <a href="#" id="hoverAnchor" style="color:var(--accent);text-decoration:underline;text-underline-offset:3px">林知远</a> 维护，最近一次更新是三天前。
+              </p>
+            </div>
+          </div>
+          <div class="hero-card" id="heroBox">
+            <div class="hero-card__head">
+              <div class="avatar" style="background:#2f5bd4">林</div>
+              <div>
+                <div class="hero-card__name">林知远</div>
+                <div class="hero-card__handle">@zhiyuan</div>
+              </div>
+            </div>
+            <p class="hero-card__bio">在设计系统组做组件库。关注无障碍和 CSS 架构。</p>
+            <div class="hero-card__stats"><span><b>142</b> 关注者</span><span><b>38</b> 文章</span></div>
+          </div>
+          <div class="stage__tag">DELAYED PREVIEW</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="dropdown-menu" data-k="dropdown menu 下拉菜单 菜单 选择">
+      <div>
+        <h2 class="spec__en">Dropdown menu</h2>
+        <p class="spec__zh">下拉菜单</p>
+        <p class="spec__one">点按钮，展开一列动作</p>
+        <p class="spec__def">点击一个按钮（通常是「⋯」或「操作」）后，在其下方展开的一列命令：编辑、复制、导出、删除。可以有图标、右侧快捷键提示、分隔线和分组标题。打开后方向键上下移动，回车执行，Esc 关闭。它回答的是「对这一个对象，我能做哪些事」。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Context menu 的差别只在「触发方式」：同样的菜单，左键点按钮就锚在按钮下，右键就锚在鼠标位置。和 Popover 的差别是「内容的同质性」：菜单里每一行都应该是同一种东西（一个可执行的动作），塞进勾选框或表单就已经不是菜单了。和 Select 的差别是「是否改变表单的值」：菜单里的动作立刻执行，Select 只是选一个值。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#context-menu">Context menu</a><a href="#popover">Popover</a><a href="#command-palette">Command palette</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>DropdownMenu</code></li><li>Ant Design：<code>Dropdown</code></li><li>shadcn：<code>DropdownMenu</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="menu"</code> / <code>menuitem</code>，方向键导航，Esc 关闭，焦点回到触发按钮。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">一个对象上挂着三个以上动作，全摆出来会太挤。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-dropdown">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="item-list" style="max-width:320px;margin-bottom:4px">
+                <div class="item-list__row">
+                  <span class="item-dot"></span>
+                  <span style="flex:1">品牌规范 v3.md</span>
+                  <span id="ddAnchor">
+                    <button class="icon-btn" id="ddBtn" aria-haspopup="menu" aria-expanded="false"><svg style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.8"><use href="#i-dots"/></svg></button>
+                  </span>
+                </div>
+              </div>
+              <p class="try">点「⋯」展开</p>
+            </div>
+          </div>
+          <div class="menu" id="ddBox" role="menu" aria-label="文件操作">
+            <div class="menu__label">文件</div>
+            <button class="menu__item" role="menuitem"><svg><use href="#i-edit"/></svg>编辑<span style="margin-left:auto"></span><kbd>↵</kbd></button>
+            <button class="menu__item" role="menuitem"><svg><use href="#i-copy"/></svg>复制链接<kbd>⌘C</kbd></button>
+            <button class="menu__item" role="menuitem"><svg><use href="#i-download"/></svg>下载<kbd>⌘S</kbd></button>
+            <div class="menu__sep"></div>
+            <div class="menu__label">危险</div>
+            <button class="menu__item menu__item--danger" role="menuitem"><svg><use href="#i-trash"/></svg>删除</button>
+          </div>
+          <div class="stage__tag">CLICK MENU</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="context-menu" data-k="context menu 右键菜单 contextual 长按">
+      <div>
+        <h2 class="spec__en">Context menu</h2>
+        <p class="spec__zh">右键菜单 / 上下文菜单</p>
+        <p class="spec__one">右键，在鼠标那里弹出来</p>
+        <p class="spec__def">在某个区域点右键（触屏上是长按）后，出现在光标位置的那一列命令。它之所以叫「上下文」，是因为内容取决于你点在哪：点在文件上给你文件操作，点在画布空白处给你粘贴和新建。位置跟着鼠标走，而不是跟着某个按钮。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Dropdown menu 的差别只有两点：触发方式（右键 vs 左键点按钮）和锚点位置（光标处 vs 按钮下方）。所以很多库干脆用同一套菜单组件，只是挂不同的事件。注意别把浏览器原生的右键菜单顶掉却不提供替代 —— 用户在页面上右键常常只是想「检查元素」或者复制文字。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#dropdown-menu">Dropdown menu</a><a href="#tooltip">Tooltip</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>ContextMenu</code></li><li>Ant Design：<code>Dropdown</code> 配 <code>trigger="contextMenu"</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">必须同时提供键盘入口（Menu 键或一个可见按钮），否则键盘用户够不到。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">画布、表格、文件列表这类有大量同类对象的界面。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-context">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="ctx-area" id="ctxArea">在这里点右键</div>
+          </div>
+          <div class="menu" id="ctxBox" role="menu" aria-label="上下文菜单">
+            <button class="menu__item" role="menuitem"><svg><use href="#i-plus"/></svg>新建文件</button>
+            <button class="menu__item" role="menuitem"><svg><use href="#i-folder"/></svg>新建文件夹</button>
+            <div class="menu__sep"></div>
+            <button class="menu__item" role="menuitem"><svg><use href="#i-copy"/></svg>粘贴<kbd>⌘V</kbd></button>
+            <button class="menu__item" role="menuitem"><svg><use href="#i-image"/></svg>作为背景</button>
+          </div>
+          <div class="stage__tag">CURSOR ANCHORED</div>
+        </div>
+      </div>
+    </article>
+
+    <!-- ===================== 引导 ===================== -->
+
+    <article class="spec" id="tour" data-k="tour 新手引导 引导 分步 onboarding 聚光灯">
+      <div>
+        <h2 class="spec__en">Tour</h2>
+        <p class="spec__zh">新手引导 / 分步导览</p>
+        <p class="spec__one">一步一步，带你看完整条流程</p>
+        <p class="spec__def">压暗整个界面，只把当前这一步要讲的那个元素照亮，旁边配一个带「下一步」的气泡。走完三步五步，用户对这块功能的骨架就有了印象。它是一条有顺序的路径，所以必须有明确的进度（1 / 3）、一个「跳过」，以及随时能退出的关闭。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Coachmark 的差别是「步数」：Coachmark 是一次一句，指向单个新功能；Tour 是多步、有先后、走完才算结束。和 Tooltip 的差别是「主动与被動」：Tooltip 等用户来悬停，Tour 是产品主动推给用户。Tour 只在第一次使用时出现，如果用户跳过，不该每次登录都再弹一次 —— 那是把引导变成了骚扰。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#coachmark">Coachmark</a><a href="#tooltip">Tooltip</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Ant Design：<code>Tour</code></li><li>Intro.js、Shepherd.js、driver.js</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">焦点移到气泡内，Esc 退出；被高亮的元素要真的可聚焦，而不是只画一圈光。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">产品的核心流程不直观，且值得花三十秒讲一遍。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-tour">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="tour-mock">
+              <div class="tour-bar" id="tourStep0"><span class="tour-bar__dot"></span>工作区切换</div>
+              <div class="tour-bar" id="tourStep1"><span class="tour-bar__dot"></span>搜索全部内容</div>
+              <div class="tour-bar" id="tourStep2"><span class="tour-bar__dot"></span>邀请成员</div>
+            </div>
+          </div>
+          <div class="tour-mask" id="tourMask"></div>
+          <div class="tour-pop" id="tourPop" role="dialog" aria-modal="true" aria-label="新手引导">
+            <div class="tour-pop__step" id="tourStepNum">第 1 / 3 步</div>
+            <p class="tour-pop__title" id="tourTitle">工作区切换</p>
+            <p class="tour-pop__desc" id="tourDesc">在这里换团队。每个工作区的成员、文件和历史都是独立的。</p>
+            <div class="tour-pop__foot">
+              <div class="tour-pop__dots" id="tourDots"><span class="tour-pop__dot is-on"></span><span class="tour-pop__dot"></span><span class="tour-pop__dot"></span></div>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn--ghost btn--sm" id="tourSkip">跳过</button>
+                <button class="btn btn--sm" id="tourNext">下一步</button>
+              </div>
+            </div>
+          </div>
+          <div class="demo-center" style="position:absolute;left:0;right:0;bottom:10px;padding:0">
+            <button class="btn btn--ghost btn--sm" id="tourStart" style="z-index:24;position:relative">演示引导</button>
+          </div>
+          <div class="stage__tag">SPOTLIGHT</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="coachmark" data-k="coachmark 新功能提示 气泡 提示 一次性">
+      <div>
+        <h2 class="spec__en">Coachmark</h2>
+        <p class="spec__zh">新功能提示</p>
+        <p class="spec__one">一个小气泡，指向那个新按钮</p>
+        <p class="spec__def">单个的、一次性的提示气泡，尾巴指向界面上的某个具体元素：一个刚上线的按钮、一个改过位置的功能。通常配一个强调色的圆点吸引注意，点「知道了」就消失，而且在用户点过之前一直有效、点过之后就再也不出现。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Tour 的差别是「范围」：Coachmark 只讲一件事，没有下一步；Tour 是一段有顺序的旅程。和 Toast 的差别是「指向性」：Toast 浮在角落，不指任何东西；Coachmark 必须锚定在一个元素上，否则它就是一句无处安放的公告。判断该用哪个：如果这句话需要用户「看到这个按钮」，用 Coachmark。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#tour">Tour</a><a href="#toast">Toast</a><a href="#tooltip">Tooltip</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>无统一标准，多数自建</li><li>Intro.js / Shepherd 可做单步模式</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">气泡要能被读屏读到并有明确的关闭按钮；不要只在视觉上有个小圆点。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">某个功能刚上线或位置变了，且用户很容易错过它。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-coach">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">出现在那个按钮上方，只此一次</p>
+              <div style="position:relative;display:inline-block" id="coachAnchor">
+                <span class="new-dot"></span>
+                <button class="btn btn--ghost" id="coachTarget">
+                  <svg style="width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.7;vertical-align:-2px;margin-right:5px"><use href="#i-star"/></svg>收藏到合集
+                </button>
+              </div>
+              <button class="btn--link" id="coachReset">让它再出现一次</button>
+            </div>
+          </div>
+          <div class="coach" id="coachBox" role="dialog" aria-label="新功能提示">
+            <p class="coach__title">现在可以收进合集了</p>
+            <p class="coach__desc">点这里把当前条目放进合集，下次从侧边栏一次打开。</p>
+            <div class="coach__foot">
+              <button class="coach__skip" id="coachSkip">知道了</button>
+              <button class="btn btn--sm btn--on-accent" id="coachOk">试试看</button>
+            </div>
+          </div>
+          <div class="stage__tag">POINTS AT ONE THING</div>
+        </div>
+      </div>
+    </article>
+
+    </div><!-- /卷一 -->
+
+    <!-- ======================= 卷二 · 表单与输入 ======================= -->
+    <div class="volume is-vol-hidden" id="vol-form">
+
+    <section class="lede" data-vol="form">
+      <h1>表单里最难的<br>不是控件。</h1>
+      <p>是那些看起来差不多、用错就静默丢数据的东西：placeholder 当 label、disabled 当 readonly、边打字边报错、开关和勾选框乱用。这一卷每个条目都给一个能真的输入、失焦、提交的演示，重点仍然是「和邻居的区别」。</p>
+      <div class="lede__note">
+        <span><b>21</b> 个概念</span>
+        <span><b>全部</b>可以真的输入</span>
+        <span>聚焦 AI 生成表单最常错的地方</span>
+      </div>
+    </section>
+
+    <article class="spec" id="select" data-vol="form" data-k="select 下拉选择 原生 select 选项">
+      <div>
+        <h2 class="spec__en">Select</h2>
+        <p class="spec__zh">下拉选择</p>
+        <p class="spec__one">从固定的一组选项里选一个</p>
+        <p class="spec__def">点开、列出全部选项、选一个、收起。选项是有限的、已知的，而且通常不多 —— 国家、时区、货币、语言。浏览器有原生实现，键盘、读屏、移动端滚轮全都免费。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Combobox 的差别是「能不能打字过滤」：选项超过十几条、或者用户知道自己要什么，就该用 Combobox。和 Dropdown menu 的差别是「选的是值还是执行动作」：Select 选中的值会进入表单提交，Dropdown 点一下是执行命令，不会留下选中状态。能用原生 <code>&lt;select&gt;</code> 就别自建 —— 自建的下拉在手机上经常滚不动。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#combobox">Combobox</a><a href="#segmented-control">Segmented control</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>&lt;select&gt;</code></li><li>Radix：<code>Select</code>（自建，为了样式）</li><li>Ant Design：<code>Select</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">原生元素自带 <code>role="combobox"</code> 与键盘支持；自建时必须自己实现方向键、Home/End、首字母跳转。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">选项固定、数量少、用户不需要搜索。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-select">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="fi">
+                <label class="fi__label" for="selTz">时区</label>
+                <select class="sel-native" id="selTz">
+                  <option>Asia/Shanghai (UTC+8)</option>
+                  <option>Asia/Tokyo (UTC+9)</option>
+                  <option>Europe/London (UTC+0)</option>
+                  <option>America/New_York (UTC-5)</option>
+                </select>
+                <div class="fi__msg fi__msg--hint" id="selOut">当前：Asia/Shanghai (UTC+8)</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">NATIVE PICKER</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="combobox" data-vol="form" data-k="combobox 组合框 自动完成 autocomplete 搜索选择 可输入下拉">
+      <div>
+        <h2 class="spec__en">Combobox</h2>
+        <p class="spec__zh">组合框 / 可搜索下拉</p>
+        <p class="spec__one">输入框加一个被过滤的列表</p>
+        <p class="spec__def">外观是一个输入框，打字的同时下面列出一串匹配项，用方向键挑、回车确认。它解决的是「选项太多」：几百个城市、几千个用户、无限多的标签。用户可以先打几个字把范围缩小，再选。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Select 的差别是「能不能搜索」；和普通输入框的差别是「值必须来自列表」。这个模式在 ARIA 里是最难写对的之一：焦点始终留在输入框上，高亮项靠 <code>aria-activedescendant</code> 指向，而不是把焦点移进列表。写错的表现是读屏念不出当前选中项。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#select">Select</a><a href="#search-input">搜索框</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>Combobox</code></li><li>shadcn：<code>Command</code> 组合 <code>Popover</code></li><li>Ant Design：<code>AutoComplete</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">输入框 <code>role="combobox"</code> + <code>aria-expanded</code> + <code>aria-controls</code>；列表 <code>role="listbox"</code>，选项 <code>role="option"</code> 带 <code>aria-selected</code>。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">选项多到滚动找很痛苦，但值是预先定义的。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-combobox">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="fi" style="max-width:320px">
+                <label class="fi__label" for="cbInput">城市</label>
+                <div class="cb" style="max-width:none">
+                  <input class="inp" id="cbInput" role="combobox" aria-expanded="false"
+                         aria-controls="cbList" aria-autocomplete="list" autocomplete="off"
+                         placeholder="输入城市名，如「上」">
+                  <div class="listbox" id="cbList" role="listbox" aria-label="城市列表"></div>
+                </div>
+                <div class="fi__msg fi__msg--hint" id="cbOut">先打字过滤，再用 ↑↓ 选</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">TYPE TO FILTER</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="radio-group" data-vol="form" data-k="radio 单选 单选框 互斥选项">
+      <div>
+        <h2 class="spec__en">Radio group</h2>
+        <p class="spec__zh">单选组</p>
+        <p class="spec__one">所有选项都摆出来，只能选一个</p>
+        <p class="spec__def">一组圆点，每个旁边一个标签，永远只有一个被选中。选项全部可见这一点很关键 —— 用户能一眼比较完所有可能性，不用先点开来找。适合互斥且需要对比的少量选项：套餐、配送方式、发票类型。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Select 的差别是「要不要先看到所有选项」：二到五个选项用 Radio，全都摊开更快；超过五六个才收进下拉。和 Segmented control 的差别是「分量」：分段控件是紧凑的形态切换（列表/网格），Radio 是正式的决策，可以带说明文字。键盘上它们是同一个组，方向键切换、Tab 只停一次。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#select">Select</a><a href="#segmented-control">Segmented control</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>&lt;input type="radio"&gt;</code></li><li>Radix：<code>RadioGroup</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">同一组共用 <code>name</code>，放在 <code>&lt;fieldset&gt;</code> + <code>&lt;legend&gt;</code> 里，否则读屏不知道这组在问什么。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">互斥选项不超过五个，且用户需要比较。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-radio">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <fieldset style="border:none;margin:0;padding:0;width:100%;display:flex;justify-content:center">
+                <legend style="font-size:12px;font-weight:600;margin-bottom:10px;padding:0">计费周期</legend>
+                <div class="radio-group" role="radiogroup" aria-label="计费周期">
+                  <label class="radio"><input type="radio" name="cycle" value="月付" checked>
+                    <span class="radio__txt">按月<small>每月 ¥39，随时取消</small></span></label>
+                  <label class="radio"><input type="radio" name="cycle" value="年付">
+                    <span class="radio__txt">按年<small>每年 ¥390，相当于省两个月</small></span></label>
+                  <label class="radio"><input type="radio" name="cycle" value="三年">
+                    <span class="radio__txt">三年<small>一次性 ¥990，锁定当前价格</small></span></label>
+                </div>
+              </fieldset>
+              <div class="fi__msg fi__msg--hint" id="radioOut">已选：按月</div>
+            </div>
+          </div>
+          <div class="stage__tag">ALL OPTIONS VISIBLE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="segmented-control" data-vol="form" data-k="segmented control 分段控件 切换 视图切换">
+      <div>
+        <h2 class="spec__en">Segmented control</h2>
+        <p class="spec__zh">分段控件</p>
+        <p class="spec__one">紧凑地切换同一内容的呈现方式</p>
+        <p class="spec__def">几个紧挨着的小按钮，选中的那个有个浮起的背景。它切换的通常是「同一个东西的不同看法」：列表还是网格、日还是周还是月、简体还是繁体。不是提交表单，切换立刻生效。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Tabs 的差别是「是否换内容面板」：Tabs 切换的是不同的内容区域，Segmented 只是换个视角看同一份数据。和 Radio 的差别是「要不要提交」：Radio 的结果要等表单提交，Segmented 点完马上就变。视觉上它更紧凑，所以适合放在工具栏里，而不是表单里。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#radio-group">Radio group</a><a href="#switch">Switch</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Material 3：<code>SegmentedButton</code></li><li>iOS：<code>UISegmentedControl</code></li><li>Radix：<code>ToggleGroup</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">用 <code>role="group"</code> 包住，每个按钮 <code>aria-pressed</code> 或 <code>aria-checked</code>；方向键切换更符合预期。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">同一份数据的几种视图，或两三个互斥的即时设定。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-seg">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="seg" role="group" aria-label="视图">
+                <button class="seg__btn is-on" data-seg="列表" aria-pressed="true">列表</button>
+                <button class="seg__btn" data-seg="网格" aria-pressed="false">网格</button>
+                <button class="seg__btn" data-seg="时间线" aria-pressed="false">时间线</button>
+              </div>
+              <div id="segPreview" style="width:100%;max-width:320px;min-height:96px;border:1px solid var(--rule-soft);border-radius:4px;display:grid;place-items:center;font-size:12px;color:var(--ink-3);background:#fbfcfd">列表视图</div>
+              <p class="try">切换立刻生效，不需要提交</p>
+            </div>
+          </div>
+          <div class="stage__tag">INSTANT</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="switch" data-vol="form" data-k="switch 开关 切换 设置项 toggle">
+      <div>
+        <h2 class="spec__en">Switch</h2>
+        <p class="spec__zh">开关</p>
+        <p class="spec__one">拨一下，立刻生效</p>
+        <p class="spec__def">一个滑块，要么开要么关。关键在于「立刻生效」—— 拨完的那一刻设置就变了，不需要找保存按钮。所以它出现在设置页、通知偏好、功能开关里，而不是出现在需要点提交的表单里。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Checkbox 的差别是「要不要提交」：这是唯一可靠的判据。Switch 改的是系统状态，马上生效；Checkbox 是在勾选一组待提交的选项。把 Switch 放进需要按「保存」的表单里是常见的错误 —— 用户会以为已经生效了，然后离开页面丢失改动。另外开关的文案要写成「打开后会怎样」，而不是「是否启用」。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#checkbox">Checkbox</a><a href="#autosave">Autosave</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>Switch</code></li><li>Ant Design：<code>Switch</code></li><li>MUI：<code>Switch</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="switch"</code> + <code>aria-checked</code>。不要用 <code>checkbox</code> 冒充 —— 读屏会念「复选框」。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">一个二值设置，改完立即生效。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-switch">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="switch-row">
+                <div class="switch-row__txt">自动续费<small>到期前一天从余额扣款</small></div>
+                <button class="switch" role="switch" aria-checked="true" aria-label="自动续费"></button>
+              </div>
+              <div class="switch-row">
+                <div class="switch-row__txt">邮件通知<small>每周一发送使用报告</small></div>
+                <button class="switch" role="switch" aria-checked="false" aria-label="邮件通知"></button>
+              </div>
+              <div class="switch-effect" id="switchOut">改动会立即保存</div>
+            </div>
+          </div>
+          <div class="stage__tag">NO SAVE BUTTON</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="checkbox" data-vol="form" data-k="checkbox 复选框 多选 全选 indeterminate">
+      <div>
+        <h2 class="spec__en">Checkbox</h2>
+        <p class="spec__zh">复选框</p>
+        <p class="spec__one">可以选零个、一个或多个</p>
+        <p class="spec__def">方框加勾，每个独立。它天然支持多选，也支持「不确定」态（<code>indeterminate</code>）—— 当子项只勾了一半，父级显示一条横线而不是勾。选中的结果通常要随表单一起提交。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Switch 的差别是「是否立即生效」。和 Radio 的差别是「能不能多选」，视觉上也刻意不同：方的能多选，圆的一定互斥 —— 这个形状约定跨平台通用，别打破。批量操作的父级勾选框必须是三态，否则用户没法表达「我取消一部分」。三态在代码里要单独设置 <code>el.indeterminate = true</code>，它不是 HTML 属性。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#switch">Switch</a><a href="#radio-group">Radio group</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>&lt;input type="checkbox"&gt;</code></li><li>Radix：<code>Checkbox</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">三态用 <code>aria-checked="mixed"</code>；点标签文字也要能勾选，所以必须包在 <code>&lt;label&gt;</code> 里。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">可以同时选多项，结果随表单提交。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-check">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="check-list" id="checkList">
+                <label class="check check--parent">
+                  <input type="checkbox" id="checkAll"> 全部通知
+                </label>
+                <div class="check-group-indent">
+                  <label class="check"><input type="checkbox" class="child-check" checked> 评论回复</label>
+                  <label class="check"><input type="checkbox" class="child-check"> 提及我的</label>
+                  <label class="check"><input type="checkbox" class="child-check"> 系统公告</label>
+                </div>
+              </div>
+              <div class="fi__msg fi__msg--hint" id="checkOut">已选 1 项</div>
+            </div>
+          </div>
+          <div class="stage__tag">INDETERMINATE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="placeholder" data-vol="form" data-k="placeholder 占位符 提示文字 label 标签">
+      <div>
+        <h2 class="spec__en">Placeholder</h2>
+        <p class="spec__zh">占位提示</p>
+        <p class="spec__one">不是标签，别拿它当标签</p>
+        <p class="spec__def">输入框里那行浅色示例文字，用来给格式参考（<code>you@example.com</code>）或补充说明。它在你开始输入的第一个字符就消失了 —— 这正是它不能承担「这栏要填什么」的原因。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Label 的差别是「输入后是否还在」：Label 常驻，Placeholder 一输入就没。只用 Placeholder 的表单，用户填到第三栏就忘了第一栏在问什么，回头检查时更是完全看不懂。正确做法是两者都要：Label 写「邮箱」，Placeholder 写「you@example.com」。另外 Placeholder 的对比度通常偏低，本身就不满足无障碍要求，不能承载必要信息。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#required-marker">必填标记</a><a href="#validation-timing">校验时机</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>placeholder</code> 属性 / <code>::placeholder</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">Placeholder 不能替代 <code>&lt;label&gt;</code>；读屏对两者的朗读优先级完全不同。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">演示格式，或补充非必要的说明。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-placeholder">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="fi ph-slot">
+                <label class="fi__label" for="phGood">邮箱</label>
+                <input class="inp" id="phGood" placeholder="you@example.com">
+                <div class="ph-note" id="phNote">上面这个：标签常驻，占位只给格式参考。</div>
+              </div>
+              <div class="fi ph-slot">
+                <input class="inp" id="phBad" placeholder="邮箱">
+                <div class="ph-note" id="phBadNote">这个只有占位 —— 输入一下就不知道这栏是什么了。</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">TYPE IN BOTH</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="password-input" data-vol="form" data-k="password 密码 显示密码 强度 可见性">
+      <div>
+        <h2 class="spec__en">Password input</h2>
+        <p class="spec__zh">密码输入框</p>
+        <p class="spec__one">遮住字符，但给一个查看的出口</p>
+        <p class="spec__def">默认把字符替换成圆点，右侧通常有一个眼睛按钮可以临时显示。现代做法还包含强度提示 —— 不是「必须含大写字母和符号」这种硬规则，而是随输入实时给出的长度与可猜性反馈。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和普通的 text 输入框的差别不只是遮字符：密码框要关掉自动更正、自动大写、拼写检查，否则手机上会把密码首字母大写。另外别忘了 <code>autocomplete="current-password"</code> 与 <code>new-password</code> 的区别 —— 填错会让密码管理器把新密码存成旧密码。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#validation-timing">校验时机</a><a href="#otp-input">OTP 输入</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>type="password"</code></li><li>浏览器内置：<code>show-password-button</code>（部分浏览器）</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">显示/隐藏按钮要有 <code>aria-pressed</code> 和明确标签；切换时输入框焦点不能丢。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">任何需要输入密码或密钥的地方。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-password">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="fi">
+                <label class="fi__label" for="pwd">密码</label>
+                <div class="inp-wrap">
+                  <input class="inp" id="pwd" type="password" placeholder="至少 8 位"
+                         autocomplete="new-password" autocapitalize="off" spellcheck="false">
+                  <button class="inp-wrap__btn" id="pwdToggle" aria-label="显示密码" aria-pressed="false">
+                    <svg viewBox="0 0 24 24" style="width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.7"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/></svg>
+                  </button>
+                </div>
+                <div class="pwd-strength" id="pwdBars" aria-hidden="true">
+                  <span class="pwd-strength__bar"></span><span class="pwd-strength__bar"></span>
+                  <span class="pwd-strength__bar"></span><span class="pwd-strength__bar"></span>
+                </div>
+                <div class="fi__msg fi__msg--hint" id="pwdOut">还没输入</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">HIDE / REVEAL</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="validation-timing" data-vol="form" data-k="validation 校验 错误提示 时机 blur 实时 提交">
+      <div>
+        <h2 class="spec__en">Validation timing</h2>
+        <p class="spec__zh">校验时机</p>
+        <p class="spec__one">什么时候报错，比报什么更重要</p>
+        <p class="spec__def">同一个校验规则，在三个时刻执行，体验完全不同：输入时（每敲一个字符就判）、失焦时（离开这一栏才判）、提交时（统一判）。三者的差别不是技术难度，是用户会不会觉得被盯着。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>常见误区是把「实时校验」当成最好的。实际上边打字边报错最糟 —— 你刚开始输入 <code>a</code>，它就说「邮箱格式不正确」。稳妥的组合是：**首次失焦时校验，之后改成实时**。这样用户第一次填完才被告知，改的时候又能立刻看到好转。提交时仍然要再校验一遍，因为用户可以绕过 blur。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#error-summary">错误摘要</a><a href="#inline-alert">Inline alert</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>React Hook Form：<code>mode: 'onBlur' | 'onChange' | 'onSubmit'</code></li><li>Zod / Valibot：只负责规则，不负责时机</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">错误文本用 <code>aria-describedby</code> 关联到输入框；输入框加 <code>aria-invalid="true"</code>。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">所有表单；默认选 onBlur，不要选 onChange。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-vt">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center" style="padding:20px 0">
+              <p class="try">三栏都输入 <code style="font-family:var(--font-mono)">abc</code> 然后依次移开焦点</p>
+              <div class="vt">
+                <div class="vt__col">
+                  <div class="vt__name">输入时</div>
+                  <input class="inp" data-vt="change" placeholder="邮箱">
+                  <div class="vt__state" data-vt-out="change">还没动</div>
+                </div>
+                <div class="vt__col">
+                  <div class="vt__name">失焦时</div>
+                  <input class="inp" data-vt="blur" placeholder="邮箱">
+                  <div class="vt__state" data-vt-out="blur">还没动</div>
+                </div>
+                <div class="vt__col">
+                  <div class="vt__name">提交时</div>
+                  <input class="inp" data-vt="submit" placeholder="邮箱">
+                  <div class="vt__state" data-vt-out="submit">还没动</div>
+                </div>
+              </div>
+              <button class="btn btn--ghost btn--sm" id="vtSubmit">提交三个输入框</button>
+            </div>
+          </div>
+          <div class="stage__tag">SAME RULE, 3 MOMENTS</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="error-summary" data-vol="form" data-k="error summary 错误摘要 表单错误 汇总 跳转">
+      <div>
+        <h2 class="spec__en">Error summary</h2>
+        <p class="spec__zh">错误摘要</p>
+        <p class="spec__one">提交失败时，把所有错误列在顶部</p>
+        <p class="spec__def">表单提交后如果有多个字段不合格，在表单最上方放一块汇总：「有 3 个问题需要修复」，下面逐条列出，每条是可点击的链接，点了直接跳到对应字段。它在长表单里尤其重要 —— 否则用户得自己一栏栏往下找哪一栏红了。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Inline alert 的差别是「粒度」：Inline alert 描述一个具体问题，靠在你身边；Error summary 是全局汇总，必须配可跳转的锚点才有用。和 Toast 的差别是「会不会消失」：错误摘要不该自动消失。还有一个无障碍细节：摘要出现时要把焦点移过去，并加上 <code>role="alert"</code>，否则读屏用户不知道提交失败了。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#validation-timing">校验时机</a><a href="#inline-alert">Inline alert</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>GOV.UK Design System：<code>Error summary</code></li><li>多数库无内置，需自建</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>role="alert"</code>，标题用真实标题元素，出现后移焦；每条链接指向对应输入框的 <code>id</code>。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">字段超过五六个的表单，或者错误可能同时出现在多处。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-summary">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div id="summarySlot"></div>
+              <form class="form-mock" id="summaryForm" novalidate style="max-width:340px">
+                <div class="field">
+                  <label for="sName">姓名</label>
+                  <input id="sName" autocomplete="off">
+                </div>
+                <div class="field">
+                  <label for="sMail">邮箱</label>
+                  <input id="sMail" autocomplete="off">
+                </div>
+                <button class="btn" type="submit">提交</button>
+              </form>
+            </div>
+          </div>
+          <div class="stage__tag">JUMP TO FIELD</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="required-marker" data-vol="form" data-k="required 必填 星号 可选 标记">
+      <div>
+        <h2 class="spec__en">Required marker</h2>
+        <p class="spec__zh">必填标记</p>
+        <p class="spec__one">标少数，还是标全部</p>
+        <p class="spec__def">表单里哪些栏必须填，得让人一眼看出来。两种策略：给必填的打星号，或者反过来，只给可选的标「选填」。选哪种取决于比例 —— 必填占多数时，标「选填」更省视觉噪音。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>常见错误是「星号加一句『带 * 为必填』的说明」—— 读屏用户听不到星号的语义，而且用户得先读说明再回头找。正确做法是给输入框加 <code>required</code> 或 <code>aria-required="true"</code>，视觉标记只是辅助。另外星号颜色别只用红色区分，色盲用户看不出。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#validation-timing">校验时机</a><a href="#error-summary">错误摘要</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>required</code> 属性</li><li>ARIA：<code>aria-required</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">星号要 <code>aria-hidden="true"</code>，真正的语义交给 <code>required</code>；否则读屏会念「星号」。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">任何有多栏的表单。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-required">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="req-compare">
+                <div class="req-compare__col">
+                  <div class="req-h">标必填</div>
+                  <div class="fi">
+                    <label class="fi__label" for="rq1">邮箱<span class="req" aria-hidden="true">*</span></label>
+                    <input class="inp" id="rq1" required placeholder="必填">
+                  </div>
+                  <div class="fi">
+                    <label class="fi__label" for="rq2">姓名</label>
+                    <input class="inp" id="rq2" placeholder="选填">
+                  </div>
+                </div>
+                <div class="req-compare__col">
+                  <div class="req-h">标选填</div>
+                  <div class="fi">
+                    <label class="fi__label" for="rq3">邮箱</label>
+                    <input class="inp" id="rq3" required placeholder="必填">
+                  </div>
+                  <div class="fi">
+                    <label class="fi__label" for="rq4">姓名<span class="opt">选填</span></label>
+                    <input class="inp" id="rq4" placeholder="选填">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">MARK MINORITY</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="autosave" data-vol="form" data-k="autosave 自动保存 保存中 已保存 状态">
+      <div>
+        <h2 class="spec__en">Autosave</h2>
+        <p class="spec__zh">自动保存</p>
+        <p class="spec__one">没有保存按钮，但得让人放心</p>
+        <p class="spec__def">编辑内容时后台默默保存，界面上给一个极轻的状态指示：正在保存 → 已保存。它省掉了「我改完要不要按保存」的犹豫，代价是用户必须信任它 —— 所以状态必须真实，不能永远显示「已保存」。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和「脏状态提示」是一对互斥的东西：自动保存意味着不存在「未保存的改动」，所以不该同时出现「你有未保存的修改」的警告条。如果做不到真自动保存，就老实做脏状态加显式保存，别假装。状态文案也有讲究：显示「已保存」要带时间（「刚刚保存」），否则用户不知道是这次的还是上次的。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#dirty-state">未保存改动</a><a href="#switch">Switch</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>无标准组件，通常自建</li><li>参考 Notion / Google Docs 的状态区</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">用 <code>aria-live="polite"</code> 播报状态变化，别用 assertive 打断用户打字。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">长文本编辑、笔记、配置面板这类持续改动的场景。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-autosave">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="fi" style="max-width:340px">
+                <label class="fi__label" for="asInput">标题</label>
+                <input class="inp" id="asInput" value="季度回顾" autocomplete="off">
+                <div class="field" style="margin-top:10px">
+                  <label for="asBody" style="font-size:12px;font-weight:600;color:var(--ink);display:block;margin-bottom:5px">正文</label>
+                  <textarea id="asBody" rows="3" style="width:100%;padding:8px 10px;font-family:var(--font-body);font-size:13px;border:1px solid var(--rule);border-radius:3px;resize:vertical;color:var(--ink)">这个季度的三个主要变化……</textarea>
+                </div>
+                <div class="autosave" id="asState" role="status" aria-live="polite">
+                  <span class="autosave__dot"></span><span id="asText">已保存</span>
+                </div>
+              </div>
+              <p class="try">改一下内容，看状态怎么走</p>
+            </div>
+          </div>
+          <div class="stage__tag">SILENT SAVE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="dirty-state" data-vol="form" data-k="dirty state 未保存 beforeunload 离开 拦截 确认">
+      <div>
+        <h2 class="spec__en">Dirty state</h2>
+        <p class="spec__zh">未保存改动</p>
+        <p class="spec__one">拦一下，别让人白填一遍</p>
+        <p class="spec__def">用户改了东西但没保存就要离开时，界面得提醒。做法通常是底部浮出一条「你有未保存的修改 · 放弃 / 保存」，同时在关闭标签页时触发浏览器的原生确认框。两件事必须配合：自己的提示负责页面内导航，<code>beforeunload</code> 负责真正离开。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Autosave 是互斥的二选一：有了自动保存就不需要脏状态。很多人两个都做，结果用户被提示两次。另外 <code>beforeunload</code> 的文案不能自定义，浏览器只给一句通用的话 —— 所以别指望它解释发生了什么，真正的说明要放在页面内的提示条里。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#autosave">Autosave</a><a href="#alert-dialog">Alert dialog</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>浏览器：<code>beforeunload</code> 事件</li><li>React Router：<code>useBlocker</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">提示条出现时不能抢焦点（用户可能正在打字）；但两个按钮都要能 Tab 到。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">有显式保存动作、且丢失代价高的表单。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-dirty">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center" style="padding-bottom:60px">
+              <div class="fi" style="max-width:340px">
+                <label class="fi__label" for="dirtyInput">项目描述</label>
+                <textarea id="dirtyInput" rows="3" style="width:100%;padding:8px 10px;font-family:var(--font-body);font-size:13px;border:1px solid var(--rule);border-radius:3px;resize:vertical;color:var(--ink)">面向设计团队的组件库。</textarea>
+              </div>
+              <p class="try">改一下，底部会浮出提示</p>
+            </div>
+          </div>
+          <div class="dirty-bar" id="dirtyBar" role="status">
+            <span class="dirty-bar__txt">你有未保存的修改</span>
+            <button class="dirty-bar__btn dirty-bar__btn--ghost" id="dirtyDiscard">放弃</button>
+            <button class="dirty-bar__btn dirty-bar__btn--primary" id="dirtySave">保存</button>
+          </div>
+          <div class="stage__tag">LEAVE GUARD</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="disabled-states" data-vol="form" data-k="disabled readonly aria-disabled 禁用 只读 三态">
+      <div>
+        <h2 class="spec__en">Disabled / Readonly</h2>
+        <p class="spec__zh">禁用 / 只读</p>
+        <p class="spec__one">三种「不能改」，行为完全不同</p>
+        <p class="spec__def"><code>disabled</code>：不可聚焦、不可点击、值不会随表单提交。<code>readonly</code>：能聚焦、能选中复制、值会提交，只是不能改。<code>aria-disabled</code>：视觉上像禁用，但仍然可聚焦、仍会提交，只是告诉读屏「现在不可用」。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>最危险的错误是用 <code>disabled</code> 表达「暂时不能改」：值会被静默丢掉，提交时后端收到的是空。另一个常见错误是把「未填完所以按钮变灰」做成 <code>disabled</code> —— 用户点不了也不知道为什么。更好的做法是让按钮可点，点了再告诉他缺哪一栏。用 <code>readonly</code> 则表示「这个值是有意义的，只是不允许你改」，比如自动生成的订单号。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#validation-timing">校验时机</a><a href="#submit-button">提交按钮</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>disabled</code> / <code>readonly</code></li><li>ARIA：<code>aria-disabled="true"</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">禁用态必须说明原因，否则读屏用户不知道该怎么解除；<code>title</code> 不算，要用可见文本。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">确实无权限用 disabled；值有意义但不可改用 readonly。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-disabled">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="statecmp">
+                <div class="statecmp__row">
+                  <div class="statecmp__tag">disabled</div>
+                  <input class="inp" id="dsDisabled" value="ORD-2026-0417" disabled>
+                  <div class="statecmp__note">不可聚焦 · 不提交</div>
+                </div>
+                <div class="statecmp__row">
+                  <div class="statecmp__tag">readonly</div>
+                  <input class="inp is-readonly" id="dsReadonly" value="ORD-2026-0417" readonly>
+                  <div class="statecmp__note">可聚焦复制 · 会提交</div>
+                </div>
+                <div class="statecmp__row">
+                  <div class="statecmp__tag">aria-disabled</div>
+                  <input class="inp" id="dsAria" value="ORD-2026-0417" aria-disabled="true"
+                         style="background:#f1f4f7;color:#93a1ad;border-color:var(--rule-soft)">
+                  <div class="statecmp__note">可聚焦 · 会提交</div>
+                </div>
+                <div class="statecmp__result" id="dsResult">点一下提交，看看哪些值真的发出去了。</div>
+                <button class="btn btn--ghost btn--sm" id="dsSubmit">提交这三个字段</button>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">SILENT DATA LOSS</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="optimistic-ui" data-vol="form" data-k="optimistic ui 乐观更新 回滚 失败 即时">
+      <div>
+        <h2 class="spec__en">Optimistic UI</h2>
+        <p class="spec__zh">乐观更新</p>
+        <p class="spec__one">先当成功，失败再撤回</p>
+        <p class="spec__def">点「添加」的瞬间就把新条目画到列表里，不等服务器回应。请求在后台跑，成功了什么都不用变；失败了就把那条标红并撤回，同时告诉用户没成功。用户感知到的延迟从「一个来回」变成「零」。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和普通「提交后等 loading」的差别是「谁来承担失败」。乐观更新的代价是必须有可靠的撤回路径 —— 如果操作不可逆（比如转账），千万别乐观。适合它的是点赞、勾选完成、发表评论这类「几乎不会失败」的操作。实现上还要注意：失败时要精确撤回那一条，而不是整个列表重新拉一遍，否则用户会看到内容跳一下。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#submit-button">提交按钮</a><a href="#skeleton">Skeleton</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>无 UI 组件，是数据层模式</li><li>TanStack Query：<code>onMutate</code> + 回滚</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">状态变化要播报（<code>aria-live</code>），尤其是失败撤回时 —— 否则读屏用户以为加成功了。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">高频、低风险、失败后可自动恢复的操作。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-opti">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="opti-list" id="optiList">
+                <div class="opti-item"><span class="opti-item__dot"></span>整理组件命名</div>
+                <div class="opti-item"><span class="opti-item__dot"></span>更新色彩规范</div>
+              </div>
+              <div class="demo-row">
+                <button class="btn btn--sm" id="optiAdd">添加任务（会成功）</button>
+                <button class="btn btn--ghost btn--sm" id="optiFail">添加任务（会失败）</button>
+              </div>
+              <div class="opti-status" id="optiStatus" role="status" aria-live="polite"></div>
+            </div>
+          </div>
+          <div class="stage__tag">ZERO PERCEIVED LATENCY</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="otp-input" data-vol="form" data-k="otp 验证码 一次性密码 输入 六位">
+      <div>
+        <h2 class="spec__en">OTP input</h2>
+        <p class="spec__zh">验证码输入</p>
+        <p class="spec__one">六个格子，自动跳下一个</p>
+        <p class="spec__def">一串独立的小格，每格一个字符。输入后自动跳到下一格，退格回到上一格，粘贴整串验证码时自动分配。它比单个输入框好在能一眼看出还差几位，也让粘贴和移动端的数字键盘有明确落点。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和普通输入框的差别不只是外观：OTP 必须设 <code>inputmode="numeric"</code> 和 <code>autocomplete="one-time-code"</code>，否则 iOS 不会弹出短信验证码的自动填充。另一个细节是别做太多格 —— 六位是常见值，但一定要和实际长度一致，多出来的空格子会让用户以为自己漏填了。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#password-input">密码输入</a><a href="#validation-timing">校验时机</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>Radix：<code>OneTimePassword</code>（独立包）</li><li>多数项目自建</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">给整组一个 <code>aria-label="6 位验证码"</code>，每格标「第 1 位」等；粘贴要能一次填满。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">短信或邮件发来的短验证码。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-otp">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <p class="try">试试输入或粘贴 <code style="font-family:var(--font-mono)">123456</code></p>
+              <div class="otp" id="otpGroup" role="group" aria-label="6 位验证码">
+                <input class="otp__box" maxlength="1" inputmode="numeric" autocomplete="one-time-code" aria-label="第 1 位">
+                <input class="otp__box" maxlength="1" inputmode="numeric" aria-label="第 2 位">
+                <input class="otp__box" maxlength="1" inputmode="numeric" aria-label="第 3 位">
+                <input class="otp__box" maxlength="1" inputmode="numeric" aria-label="第 4 位">
+                <input class="otp__box" maxlength="1" inputmode="numeric" aria-label="第 5 位">
+                <input class="otp__box" maxlength="1" inputmode="numeric" aria-label="第 6 位">
+              </div>
+              <div class="fi__msg fi__msg--hint" id="otpOut">还差 6 位</div>
+              <button class="btn--link" id="otpReset">重新输入</button>
+            </div>
+          </div>
+          <div class="stage__tag">AUTO ADVANCE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="dropzone" data-vol="form" data-k="dropzone 拖放 上传 文件 拖拽区域">
+      <div>
+        <h2 class="spec__en">Dropzone</h2>
+        <p class="spec__zh">拖放上传区</p>
+        <p class="spec__one">一个很明显「可以往里扔」的框</p>
+        <p class="spec__def">一块虚线边框的区域，提示可以拖文件进来，也可以点击打开文件选择器。拖进去的瞬间边框变色、背景变亮，让用户确认「松手会落在这里」。上传开始后，这块区域会变成文件列表加进度。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和普通「选择文件」按钮的差别是「能不能拖」。但拖放永远只能是增强，不能是唯一入口 —— 触屏设备没有拖拽，键盘用户也不行，所以点击选择必须同时存在。另一个容易漏的是 dragleave 的抖动问题：子元素会触发父级的离开事件，需要用一个计数器判断真正的离开。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#progress">Progress</a><a href="#submit-button">提交按钮</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>react-dropzone（最常用）</li><li>Uppy、FilePond</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">必须能用键盘操作：区域本身可聚焦，回车打开选择器；拖放只是额外的便利。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">上传文件是主要动作，且用户常一次传多个。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-drop">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="上传文件">
+                <svg class="dropzone__icon" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4.5 15v4.5h15V15"/></svg>
+                <p class="dropzone__title">把文件拖到这里</p>
+                <p class="dropzone__hint">或者点击选择 · PNG / JPG / PDF，单个不超过 10MB</p>
+              </div>
+              <div class="file-list" id="fileList"></div>
+            </div>
+          </div>
+          <div class="stage__tag">DRAG &amp; CLICK</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="slider" data-vol="form" data-k="slider 滑块 范围 range 数值">
+      <div>
+        <h2 class="spec__en">Slider</h2>
+        <p class="spec__zh">滑块</p>
+        <p class="spec__one">在一个范围里挑一个大概的值</p>
+        <p class="spec__def">一条轨道加一个可拖的圆点。它擅长表达「大概在这个区间」，不擅长精确输入 —— 拖到一个精确的 37 很难，但拖到「偏小」很容易。所以它适合音量、亮度、价格区间这类感受型参数。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和数字输入框的差别是「精度要求」：需要填「年龄 34」就用输入框，需要调「字号大概大一点」才用滑块。两者常配成一对：滑块负责快速调，旁边跟一个输入框显示并可精确修改。别只做滑块 —— 键盘用户按方向键一次只能动一格，跨越 0 到 100 要点一百次。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#spinbutton">Spinbutton</a><a href="#segmented-control">Segmented control</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>&lt;input type="range"&gt;</code></li><li>Radix：<code>Slider</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">原生 range 自带 <code>role="slider"</code> 和键盘支持；注意 <code>aria-valuetext</code> 让读屏念「中等」而不是「50」。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">范围连续、精度要求不高、需要即时预览效果。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-slider">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="slider-wrap">
+                <div class="slider-head">
+                  <span class="slider-head__label">字号</span>
+                  <span class="slider-head__val" id="slVal">16px</span>
+                </div>
+                <input class="slider" type="range" id="slider" min="12" max="28" value="16" step="1"
+                       aria-label="字号" aria-valuetext="16 像素">
+                <div class="slider-scale"><span>12</span><span>20</span><span>28</span></div>
+              </div>
+              <p id="slPreview" style="font-size:16px;line-height:1.6;max-width:320px;transition:font-size .12s">界面模式图鉴 · 拖一下滑块试试</p>
+            </div>
+          </div>
+          <div class="stage__tag">LIVE PREVIEW</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="spinbutton" data-vol="form" data-k="spinbutton 数字输入 步进器 加减 number">
+      <div>
+        <h2 class="spec__en">Spinbutton</h2>
+        <p class="spec__zh">数字步进框</p>
+        <p class="spec__one">能直接输入，也能点着加一减一</p>
+        <p class="spec__def">一个数字输入框，两侧配上下箭头。既能直接键入精确值，也能用按钮小步调整。适合数量、份数、页数、超时秒数这类既需要精确又常用整数步进的字段。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Slider 的差别是「精度与范围」：数值范围大、需要填确切的数字，用 Spinbutton。和普通文本输入框的差别是「边界与步长」：Spinbutton 应该明确最小值、最大值、步长，并且在到达边界时禁用对应箭头 —— 否则用户会一直点但数字不动，以为坏了。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#slider">Slider</a><a href="#otp-input">OTP 输入</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>&lt;input type="number"&gt;</code></li><li>ARIA：<code>role="spinbutton"</code></li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">用 <code>aria-valuemin</code> / <code>valuemax</code> / <code>valuenow</code>；上下方向键要能调整数值。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">整数或小数、有明确上下限、常用小步调整。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-spin">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="fi">
+                <label class="fi__label" for="spinVal">副本数量</label>
+                <div class="spin" role="group" aria-label="副本数量">
+                  <button class="spin__btn" id="spinMinus" aria-label="减少">−</button>
+                  <input class="spin__input" id="spinVal" type="number" value="1" min="1" max="9"
+                         aria-label="副本数量">
+                  <button class="spin__btn" id="spinPlus" aria-label="增加">+</button>
+                </div>
+                <div class="fi__msg fi__msg--hint" id="spinOut">每份 0.4 GB · 共 0.4 GB</div>
+              </div>
+            </div>
+          </div>
+          <div class="stage__tag">STEP + TYPE</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="search-input" data-vol="form" data-k="search 搜索框 防抖 debounce 清空">
+      <div>
+        <h2 class="spec__en">Search input</h2>
+        <p class="spec__zh">搜索框</p>
+        <p class="spec__one">边打边搜，但别每敲一个字都发请求</p>
+        <p class="spec__def">一个带放大镜图标的输入框，输入即搜，右侧有清空按钮。和普通输入框的差别在于它触发的是即时查询而不是表单提交，所以必须处理「中途的每个字符」—— 用户打到一半时不该被当成一次正式搜索。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和 Combobox 的差别是「结果在哪里」：Combobox 的结果是选项列表，选中后填入输入框；搜索框的结果是页面内容，输入框只是触发器。实践上必须做防抖（约 200-300ms），否则打五个字发五次请求。还要处理空结果和清空——清空按钮只在有内容时出现。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#combobox">Combobox</a><a href="#command-palette">Command palette</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>HTML：<code>&lt;input type="search"&gt;</code></li><li>React：<code>useDeferredValue</code> 或防抖 hook</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v"><code>type="search"</code> 会给读屏「搜索」语义；结果数量变化用 <code>aria-live</code> 播报。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">数据量大到需要按关键词缩小范围。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-search-demo">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="search-demo">
+                <div class="inp-wrap inp-wrap--lead">
+                  <svg class="inp-wrap__icon" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
+                  <input class="inp" id="searchDemo" type="search" placeholder="搜索文档…" autocomplete="off">
+                </div>
+                <div class="search-log" id="searchLog">等待输入</div>
+              </div>
+              <p class="try">防抖 300ms：停下来才算一次搜索</p>
+            </div>
+          </div>
+          <div class="stage__tag">DEBOUNCED</div>
+        </div>
+      </div>
+    </article>
+
+    <article class="spec" id="submit-button" data-vol="form" data-k="submit 提交按钮 loading 禁用 防止重复">
+      <div>
+        <h2 class="spec__en">Submit button</h2>
+        <p class="spec__zh">提交按钮</p>
+        <p class="spec__one">点一次，别让它被点三次</p>
+        <p class="spec__def">表单的最后一步，也是最容易被连点的地方。正确形态是：点击后立刻进入等待态（文字换成「保存中」加一个转圈），按钮暂时不可再点，请求结束再恢复。这样既防重复提交，也让用户知道「点到了」。</p>
+        <div class="diff">
+          <span class="diff__label">容易混淆</span>
+          <p>和「禁用按钮直到表单合法」是两种不同的策略，而且后者常被滥用。如果一开始就灰着，用户不知道为什么点不了，也不知道还差什么。更好的做法：按钮始终可点，点了以后把缺的项标出来。真正该禁用的情况只有一种 —— 请求正在进行中。</p>
+        </div>
+        <div class="xref"><span class="xref__label">对照看</span><a href="#disabled-states">禁用 / 只读</a><a href="#optimistic-ui">乐观更新</a></div>
+        <div class="meta">
+          <div class="meta__row"><div class="meta__k">库里叫</div><div class="meta__v"><ul><li>无专用组件，是按钮的一种状态</li></ul></div></div>
+          <div class="meta__row"><div class="meta__k">无障碍</div><div class="meta__v">等待态用 <code>aria-busy="true"</code>，并保留按钮的可访问名称；别把整段文字替换成一个没有含义的图标。</div></div>
+          <div class="meta__row"><div class="meta__k">何时用</div><div class="meta__v">所有会产生写操作的提交。</div></div>
+        </div>
+      </div>
+      <div class="stagewrap">
+        <div class="stage" id="stage-submit">
+          <div class="stage__grid"></div>
+          <div class="stage__body">
+            <div class="demo-center">
+              <div class="fi" style="max-width:320px">
+                <label class="fi__label" for="subTitle">项目名</label>
+                <input class="inp" id="subTitle" value="design-system" autocomplete="off">
+              </div>
+              <button class="btn btn--block" id="subBtn">
+                <span id="subText">创建项目</span>
+              </button>
+              <div class="fi__msg fi__msg--hint" id="subOut" style="text-align:center">连点试试，只会提交一次</div>
+            </div>
+          </div>
+          <div class="stage__tag">GUARD AGAINST DOUBLE</div>
+        </div>
+      </div>
+    </article>
+
+    </div><!-- /卷二 -->
+
+    <div class="no-result" id="noResult">没有匹配的概念。试试 <code>toast</code>、<code>遮罩</code> 或 <code>确认</code>。</div>
+
+    <footer class="foot">
+      <span>界面模式图鉴 — 用来看懂，不是拿来抄。</span>
+      <span><code>再补一个概念，就在这张表里加一行。</code></span>
+    </footer>
+
+  </main>
+</div>
+
+<script src="app.js"></script>
+<script src="forms.js"></script>
+</body>
+</html>
