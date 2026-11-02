@@ -183,6 +183,50 @@
       : '搜索 select、校验、只读…';
   }
 
+  // 窄屏目录：左栏索引在 1080px 以下是隐藏的，这里把同一份索引浮出来，不另维护一份
+  function wireIndexToggle() {
+    const btn = $('#indexToggle');
+    if (!btn) return;
+    const wide = window.matchMedia('(min-width: 1081px)');
+    const isOpen = () => document.body.classList.contains('is-index-open');
+
+    function set(open) {
+      document.body.classList.toggle('is-index-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.textContent = open ? '收起目录' : '目录';
+    }
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      set(!isOpen());
+      if (!isOpen()) return;
+      // 把当前位置露出来，键盘用户直接落在当前条目上
+      const cur = $('.index__link.is-active', indexEl) || $('.index__link', indexEl);
+      if (cur) {
+        keepInList(indexEl, cur);
+        cur.focus({ preventScroll: true });
+      }
+    });
+
+    indexEl.addEventListener('click', e => {
+      if (isOpen() && e.target.closest('.index__link')) set(false);
+    });
+    document.addEventListener('click', e => {
+      if (!isOpen() || indexEl.contains(e.target) || btn.contains(e.target)) return;
+      set(false);
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape' || !isOpen()) return;
+      const inside = indexEl.contains(document.activeElement);
+      set(false);
+      if (inside) btn.focus({ preventScroll: true });
+    });
+    // 窗口拉宽回到桌面布局时，索引回到左栏，浮层状态清掉
+    const onWide = () => { if (wide.matches) set(false); };
+    if (wide.addEventListener) wide.addEventListener('change', onWide);
+    else if (wide.addListener) wide.addListener(onWide);
+  }
+
   // 直接跳转时闪一下，让人知道落在哪
   function wireHashFlash() {
     const flash = id => {
@@ -1693,6 +1737,7 @@
     wireVolumeSwitch();
     wireSearch();
     wireHashFlash();
+    wireIndexToggle();
 
     // 恢复上次看的卷；地址里带锚点时以锚点所属的卷为准
     let startVol = 'overlay';

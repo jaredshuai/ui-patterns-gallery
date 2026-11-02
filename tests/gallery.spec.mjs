@@ -633,6 +633,52 @@ test('⌘K / Ctrl K 只在命令面板舞台内生效', async ({ page }) => {
   await expect(page.locator('#paletteBox')).not.toHaveClass(/is-open/);
 });
 
+test('桌面宽度下目录按钮不出现', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto('/');
+  await expect(page.locator('#indexToggle')).toBeHidden();
+  await expect(page.locator('#index')).toBeVisible();
+});
+
+test.describe('窄屏目录', () => {
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+
+  test('目录按钮能打开索引、点条目跳转后自动收起', async ({ page }) => {
+    await page.goto('/');
+    const toggle = page.locator('#indexToggle');
+    const index = page.locator('#index');
+
+    await expect(index).toBeHidden();
+    await toggle.tap();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    await expect(index).toBeVisible();
+    // 面板不超出视口，也不造成横向滚动
+    expect(await index.evaluate(el => {
+      const r = el.getBoundingClientRect();
+      return r.left >= 0 && r.right <= innerWidth && r.top >= 0 && r.bottom <= innerHeight;
+    })).toBe(true);
+
+    await index.getByRole('link', { name: 'Drawer' }).tap();
+    await expect(index).toBeHidden();
+    await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    await settleScroll(page);
+    await expect(page.locator('#drawer .spec__en')).toBeInViewport();
+
+    // 切到卷二后目录跟着换
+    await page.locator('.volsw__btn[data-vol="form"]').tap();
+    await toggle.tap();
+    await expect(index.getByRole('link', { name: 'Combobox' })).toBeVisible();
+    await expect(index.getByRole('link', { name: 'Toast' })).toHaveCount(0);
+
+    // 点外面收起
+    await page.locator('#vol-form .lede h1').tap();
+    await expect(index).toBeHidden();
+
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+});
+
 test('页面运行时没有未捕获脚本错误', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
