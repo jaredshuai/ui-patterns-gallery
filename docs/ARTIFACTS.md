@@ -42,6 +42,10 @@
 | CHANGELOG.md | 工作与进度 | current | 书记员 / 每次发版时 | 提交历史编译的变更记录；Keep a Changelog |
 | scripts/changelog.mjs | 工作与进度 | current | 书记员 / 发版流程变更时 | CHANGELOG 播种、校验与发版编译工具 |
 | scripts/check_report_layers.mjs | 验证与观察 | current | 审查者 / 报告分层规则变更时 | 交付报告分层段落播种与结构校验器 |
+| package.json | 现状与使用说明 | current | 维护者 / 启动或质量门禁命令变化时 | 本地静态服务器与质量门禁入口：npm start、npm run check、npm run test:e2e |
+| playwright.config.mjs | 验证与观察 | current | 维护者 / 浏览器或测试入口变化时 | Playwright 配置；自动拉起 scripts/serve.mjs 并对 127.0.0.1:4173 执行回归；chromium / webkit / firefox 三浏览器 project |
+| scripts/serve.mjs | 现状与使用说明 | current | 维护者 / 本地服务行为变化时 | 零依赖静态服务器；禁止目录穿越，关闭缓存便于本地验收 |
+| tests/gallery.spec.mjs | 验证与观察 | current | 维护者 / 交互行为或回归范围变化时 | Playwright 端到端回归：遮罩拦截、浮层定位、焦点陷阱、键盘/触屏路径、重复 id 与热区尺寸；三浏览器各跑一遍 |
 <!-- 示例：| README.md#快速开始 | 现状与使用说明 | current | 维护者与各角色 / 上手流程或命令变化时 | 根目录快速上手指引 | -->
 <!-- 示例：| specs/pay-v2.md | 需求与验收 | current | 规划者 / 支付网关变更时 | 现行支付网关重构规格；supersedes specs/pay-v1.md | -->
 <!-- 示例：| specs/pay-v1.md | 需求与验收 | superseded | 规划者 / 历史保留 | 初版支付规格；superseded by specs/pay-v2.md；原位保留 | -->

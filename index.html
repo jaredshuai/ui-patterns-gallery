@@ -203,9 +203,10 @@
             <div class="page-mock">
               <div id="bannerSlot">
                 <div class="banner">
-                  <span class="banner__text">服务将于今晚 23:00 进行维护，预计 30 分钟。<a class="banner__link">查看详情</a></span>
+                  <span class="banner__text">服务将于今晚 23:00 进行维护，预计 30 分钟。<a class="banner__link" href="#" aria-controls="bannerDetail" aria-expanded="false">查看详情</a></span>
                   <button class="banner__close" id="bannerClose" aria-label="关闭公告">&times;</button>
                 </div>
+                <p class="banner__detail" id="bannerDetail" hidden>维护窗口 23:00–23:30，影响全部项目；期间部署会排队，完成后自动继续。</p>
               </div>
               <div class="mock-page">
                 <div class="sk sk--title"></div>
@@ -622,8 +623,11 @@
           <div class="scrim" id="sheetScrim"></div>
           <div class="sheet" id="sheetBox" role="dialog" aria-modal="true" aria-label="地点详情">
             <div class="sheet__grab"></div>
-            <div class="sheet__body">
+            <div class="sheet__head">
               <p class="sheet__title">筑地本愿寺</p>
+              <button class="icon-btn" data-close="sheet" aria-label="关闭">&times;</button>
+            </div>
+            <div class="sheet__body">
               <p class="sheet__desc">东京都中央区。营业至 17:00，距当前位置 1.2 公里。</p>
               <div class="sheet__rows">
                 <div class="sheet__row"><svg style="width:15px;height:15px;stroke:var(--ink-3);fill:none;stroke-width:1.6"><use href="#i-star"/></svg>收藏</div>
@@ -705,7 +709,7 @@
               <div class="thumbs" id="thumbStrip"></div>
             </div>
           </div>
-          <div class="lightbox" id="lbOverlay" role="dialog" aria-modal="true" aria-label="图片查看器">
+          <div class="lightbox" id="lbOverlay" role="dialog" aria-modal="true" aria-label="图片查看器" aria-hidden="true">
             <button class="lightbox__close" id="lbClose" aria-label="关闭">&times;</button>
             <button class="lightbox__nav lightbox__nav--prev" id="lbPrev" aria-label="上一张">&#8249;</button>
             <img class="lightbox__img" id="lbImg" alt="">
@@ -746,7 +750,7 @@
           </div>
           <div class="scrim" id="paletteScrim"></div>
           <div class="palette" id="paletteBox" role="dialog" aria-modal="true" aria-label="命令面板">
-            <input class="palette__input" id="paletteInput" placeholder="输入命令或搜索…" role="combobox" aria-expanded="true" aria-controls="paletteList" autocomplete="off">
+            <input class="palette__input" id="paletteInput" placeholder="输入命令或搜索…" role="combobox" aria-label="搜索命令" aria-autocomplete="list" aria-expanded="false" aria-controls="paletteList" autocomplete="off">
             <div class="palette__list" id="paletteList" role="listbox"></div>
             <div class="palette__kbdhint"><span>↑↓ 选择</span><span>↵ 执行</span><span>ESC 关闭</span></div>
           </div>
@@ -904,7 +908,7 @@
             <div class="demo-center">
               <p class="try">停在名字上别动，约 0.4 秒后出现</p>
               <p style="font-size:13.5px;line-height:1.9;max-width:340px;color:var(--ink-2)">
-                这条设计规范由 <a href="#" id="hoverAnchor" style="color:var(--accent);text-decoration:underline;text-underline-offset:3px">林知远</a> 维护，最近一次更新是三天前。
+                这条设计规范由 <a href="#" id="hoverAnchor" aria-controls="heroBox" aria-expanded="false" style="color:var(--accent);text-decoration:underline;text-underline-offset:3px">林知远</a> 维护，最近一次更新是三天前。
               </p>
             </div>
           </div>
@@ -993,7 +997,7 @@
         <div class="stage" id="stage-context">
           <div class="stage__grid"></div>
           <div class="stage__body">
-            <div class="ctx-area" id="ctxArea">在这里点右键</div>
+            <div class="ctx-area" id="ctxArea" role="button" tabindex="0" aria-haspopup="menu" aria-expanded="false">在这里点右键</div>
           </div>
           <div class="menu" id="ctxBox" role="menu" aria-label="上下文菜单">
             <button class="menu__item" role="menuitem"><svg><use href="#i-plus"/></svg>新建文件</button>
@@ -1035,8 +1039,8 @@
               <div class="tour-bar" id="tourStep1"><span class="tour-bar__dot"></span>搜索全部内容</div>
               <div class="tour-bar" id="tourStep2"><span class="tour-bar__dot"></span>邀请成员</div>
             </div>
+            <div class="tour-mask" id="tourMask"></div>
           </div>
-          <div class="tour-mask" id="tourMask"></div>
           <div class="tour-pop" id="tourPop" role="dialog" aria-modal="true" aria-label="新手引导">
             <div class="tour-pop__step" id="tourStepNum">第 1 / 3 步</div>
             <p class="tour-pop__title" id="tourTitle">工作区切换</p>
@@ -1458,18 +1462,18 @@
               <div class="vt">
                 <div class="vt__col">
                   <div class="vt__name">输入时</div>
-                  <input class="inp" data-vt="change" placeholder="邮箱">
-                  <div class="vt__state" data-vt-out="change">还没动</div>
+                  <input class="inp" data-vt="change" placeholder="邮箱" aria-label="邮箱（输入时校验）" aria-describedby="vtStateChange">
+                  <div class="vt__state" data-vt-out="change" id="vtStateChange">还没动</div>
                 </div>
                 <div class="vt__col">
                   <div class="vt__name">失焦时</div>
-                  <input class="inp" data-vt="blur" placeholder="邮箱">
-                  <div class="vt__state" data-vt-out="blur">还没动</div>
+                  <input class="inp" data-vt="blur" placeholder="邮箱" aria-label="邮箱（失焦时校验）" aria-describedby="vtStateBlur">
+                  <div class="vt__state" data-vt-out="blur" id="vtStateBlur">还没动</div>
                 </div>
                 <div class="vt__col">
                   <div class="vt__name">提交时</div>
-                  <input class="inp" data-vt="submit" placeholder="邮箱">
-                  <div class="vt__state" data-vt-out="submit">还没动</div>
+                  <input class="inp" data-vt="submit" placeholder="邮箱" aria-label="邮箱（提交时校验）" aria-describedby="vtStateSubmit">
+                  <div class="vt__state" data-vt-out="submit" id="vtStateSubmit">还没动</div>
                 </div>
               </div>
               <button class="btn btn--ghost btn--sm" id="vtSubmit">提交三个输入框</button>
@@ -1679,17 +1683,17 @@
               <div class="statecmp">
                 <div class="statecmp__row">
                   <div class="statecmp__tag">disabled</div>
-                  <input class="inp" id="dsDisabled" value="ORD-2026-0417" disabled>
+                  <input class="inp" id="dsDisabled" value="ORD-2026-0417" disabled aria-label="订单号（禁用）">
                   <div class="statecmp__note">不可聚焦 · 不提交</div>
                 </div>
                 <div class="statecmp__row">
                   <div class="statecmp__tag">readonly</div>
-                  <input class="inp is-readonly" id="dsReadonly" value="ORD-2026-0417" readonly>
+                  <input class="inp is-readonly" id="dsReadonly" value="ORD-2026-0417" readonly aria-label="订单号（只读）">
                   <div class="statecmp__note">可聚焦复制 · 会提交</div>
                 </div>
                 <div class="statecmp__row">
                   <div class="statecmp__tag">aria-disabled</div>
-                  <input class="inp" id="dsAria" value="ORD-2026-0417" aria-disabled="true"
+                  <input class="inp" id="dsAria" value="ORD-2026-0417" aria-disabled="true" aria-label="订单号（aria-disabled）"
                          style="background:#f1f4f7;color:#93a1ad;border-color:var(--rule-soft)">
                   <div class="statecmp__note">可聚焦 · 会提交</div>
                 </div>
@@ -1803,7 +1807,7 @@
           <div class="stage__grid"></div>
           <div class="stage__body">
             <div class="demo-center">
-              <div class="dropzone" id="dropzone" role="button" tabindex="0" aria-label="上传文件">
+              <div class="dropzone" id="dropzoneArea" role="button" tabindex="0" aria-label="上传文件">
                 <svg class="dropzone__icon" viewBox="0 0 24 24"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4.5 15v4.5h15V15"/></svg>
                 <p class="dropzone__title">把文件拖到这里</p>
                 <p class="dropzone__hint">或者点击选择 · PNG / JPG / PDF，单个不超过 10MB</p>
@@ -1843,7 +1847,7 @@
                   <span class="slider-head__label">字号</span>
                   <span class="slider-head__val" id="slVal">16px</span>
                 </div>
-                <input class="slider" type="range" id="slider" min="12" max="28" value="16" step="1"
+                <input class="slider" type="range" id="sliderInput" min="12" max="28" value="16" step="1"
                        aria-label="字号" aria-valuetext="16 像素">
                 <div class="slider-scale"><span>12</span><span>20</span><span>28</span></div>
               </div>
@@ -1919,9 +1923,10 @@
               <div class="search-demo">
                 <div class="inp-wrap inp-wrap--lead">
                   <svg class="inp-wrap__icon" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>
-                  <input class="inp" id="searchDemo" type="search" placeholder="搜索文档…" autocomplete="off">
+                  <input class="inp" id="searchDemo" type="search" placeholder="搜索文档…" autocomplete="off" aria-label="搜索文档">
+                  <button class="inp-wrap__btn" id="searchClear" type="button" aria-label="清空搜索" hidden>&times;</button>
                 </div>
-                <div class="search-log" id="searchLog">等待输入</div>
+                <div class="search-log" id="searchLog" role="status" aria-live="polite">等待输入</div>
               </div>
               <p class="try">防抖 300ms：停下来才算一次搜索</p>
             </div>

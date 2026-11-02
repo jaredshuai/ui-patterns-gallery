@@ -199,7 +199,7 @@
      通用：把浮层摆到锚点旁边（相对 stage 坐标）
      ------------------------------------------------------------ */
 
-  function placeNear(stage, box, anchor, opt) {
+  function positionNear(stage, box, anchor, opt) {
     const o = Object.assign({ side: 'bottom', align: 'start', gap: 8 }, opt || {});
     const sr = stage.getBoundingClientRect();
     const ar = anchor.getBoundingClientRect();
@@ -208,30 +208,75 @@
 
     let top, left;
 
+    const pad = 8;
+    const anchorTop = ar.top - sr.top;
+    const anchorBottom = ar.bottom - sr.top;
+    const anchorLeft = ar.left - sr.left;
+    const anchorRight = ar.right - sr.left;
+
     if (o.side === 'bottom') {
-      top = ar.bottom - sr.top + o.gap;
+      top = anchorBottom + o.gap;
       left = o.align === 'end' ? ar.right - sr.left - bw : ar.left - sr.left;
+      // 下方放不下就翻到上方，别让浮层盖住自己的触发按钮
+      if (top + bh > sr.height - pad && anchorTop - bh - o.gap >= 0) {
+        top = anchorTop - bh - o.gap;
+      }
     } else if (o.side === 'top') {
-      top = ar.top - sr.top - bh - o.gap;
+      top = anchorTop - bh - o.gap;
       left = o.align === 'end' ? ar.right - sr.left - bw : ar.left - sr.left;
+      if (top < 0 && anchorBottom + o.gap + bh <= sr.height) {
+        top = anchorBottom + o.gap;
+      }
     } else if (o.side === 'left') {
-      top = ar.top - sr.top;
+      top = anchorTop;
       left = ar.left - sr.left - bw - o.gap;
     } else { // right
-      top = ar.top - sr.top;
+      top = anchorTop;
       left = ar.right - sr.left + o.gap;
     }
 
     // 夹在舞台内
-    const pad = 8;
     left = Math.max(pad, Math.min(left, sr.width - bw - pad));
     top = Math.max(pad, Math.min(top, sr.height - bh - pad));
+
+    // 夹紧之后如果压到了触发按钮，就换一个放得下的方向。宁可放侧面，也别盖住入口
+    const coversAnchor = !(left + bw <= anchorLeft || left >= anchorRight || top + bh <= anchorTop || top >= anchorBottom);
+    if (coversAnchor) {
+      const spaceBelow = sr.height - anchorBottom - o.gap - pad;
+      const spaceAbove = anchorTop - o.gap - pad;
+      if (spaceBelow >= bh) {
+        top = anchorBottom + o.gap;
+      } else if (spaceAbove >= bh) {
+        top = anchorTop - bh - o.gap;
+      } else {
+        const spaceRight = sr.width - anchorRight - o.gap - pad;
+        const spaceLeft = anchorLeft - o.gap - pad;
+        top = Math.max(pad, Math.min(anchorTop, sr.height - bh - pad));
+        if (spaceRight >= bw) left = anchorRight + o.gap;
+        else if (spaceLeft >= bw) left = anchorLeft - bw - o.gap;
+      }
+      left = Math.max(pad, Math.min(left, sr.width - bw - pad));
+      top = Math.max(pad, Math.min(top, sr.height - bh - pad));
+    }
 
     box.style.top = top + 'px';
     box.style.left = left + 'px';
     box.style.right = 'auto';
     box.style.bottom = 'auto';
     box.style.transform = '';
+  }
+
+  // 打开的那一帧页面可能还在滚动/回流（移动端尤其是），再对齐两次，别停在半路
+  function placeNear(stage, box, anchor, opt) {
+    positionNear(stage, box, anchor, opt);
+    cancelAnimationFrame(box.__placeRaf);
+    clearTimeout(box.__placeTimer);
+    box.__placeRaf = requestAnimationFrame(() => {
+      if (box.classList.contains('is-open')) positionNear(stage, box, anchor, opt);
+    });
+    box.__placeTimer = setTimeout(() => {
+      if (box.classList.contains('is-open')) positionNear(stage, box, anchor, opt);
+    }, 200);
   }
 
   /* ------------------------------------------------------------
@@ -412,11 +457,28 @@
         setTimeout(() => { slot.innerHTML = ''; }, 160);
       });
     }
+
+    // 「查看详情」是真链接，不是装饰：展开一段维护说明
+    function wireDetail() {
+      const link = $('.banner__link', slot);
+      const detail = $('.banner__detail', slot);
+      if (!link || !detail) return;
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const opening = detail.hidden;
+        detail.hidden = !opening;
+        link.setAttribute('aria-expanded', opening ? 'true' : 'false');
+        link.textContent = opening ? '收起详情' : '查看详情';
+      });
+    }
+
     wireClose();
+    wireDetail();
 
     reset.addEventListener('click', () => {
       slot.innerHTML = original;
       wireClose();
+      wireDetail();
     });
   }
 
@@ -659,21 +721,63 @@
 
   const openStack = [];
 
+  const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+  function focusablesIn(box) {
+    return $$(FOCUSABLE, box).filter(el => !el.inert && el.offsetParent !== null);
+  }
+
+  // 关浮层时要把焦点还回「打开它的那个控件」。Safari/WebKit 点击按钮不会给按钮焦点，
+  // 此时 activeElement 是 body，直接记下来就会把焦点还到 body，键盘用户丢掉位置。
+  function focusOrigin(trigger) {
+    const active = document.activeElement;
+    if (active && active !== document.body && active !== document.documentElement) return active;
+    return trigger || null;
+  }
+
+  // 把 Tab 锁在浮层里；关着的时候 inert 会让里面的按钮彻底退出 Tab 顺序。
+  // 监听挂在 document 上：Safari 点击按钮不会给按钮焦点，点完浮层里的控件后
+  // 焦点会落到 body，这时候挂在浮层上的 keydown 根本收不到 Tab，焦点就跑了。
+  function trapTab(box, isOpen) {
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Tab' || !isOpen()) return;
+      const items = focusablesIn(box);
+      if (!items.length) { e.preventDefault(); return; }
+      const first = items[0];
+      const last = items[items.length - 1];
+      const active = document.activeElement;
+      if (!box.contains(active)) { e.preventDefault(); first.focus({ preventScroll: true }); return; }
+      if (e.shiftKey && active === first) { e.preventDefault(); last.focus({ preventScroll: true }); }
+      else if (!e.shiftKey && active === last) { e.preventDefault(); first.focus({ preventScroll: true }); }
+    });
+  }
+
   function makeOverlay(opts) {
-    const { stage, scrim, box, trigger, onOpen, onClose, escCloses = true, outsideCloses = true } = opts;
+    const { stage, scrim, box, trigger, onOpen, onClose, escCloses = true, outsideCloses = true, initialFocus = null } = opts;
 
     let open = false;
     let lastFocus = null;
 
+    box.inert = true;
+    if (!box.hasAttribute('tabindex')) box.tabIndex = -1;
+
+    function focusInto() {
+      const target = initialFocus ? $(initialFocus, box) : null;
+      const el = target || focusablesIn(box)[0] || box;
+      el.focus({ preventScroll: true });
+    }
+
     function show() {
       if (open) return;
       open = true;
-      lastFocus = document.activeElement;
+      lastFocus = focusOrigin(trigger);
+      box.inert = false;
       if (scrim) { scrim.classList.add('is-open'); }
       box.classList.add('is-open');
       if (openStack.indexOf(api) === -1) openStack.push(api);
       if (onOpen) onOpen();
       stage.__activeOverlay = api;
+      setTimeout(() => { if (open) focusInto(); }, 0);
     }
 
     function hide() {
@@ -685,7 +789,10 @@
       if (at !== -1) openStack.splice(at, 1);
       if (onClose) onClose();
       if (stage.__activeOverlay === api) stage.__activeOverlay = null;
+      // 焦点还在浮层里时，WebKit 会在盒子变 inert 之后把它清到 body，
+      // 所以先把焦点交还到浮层外面，再设 inert。
       if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
+      box.inert = true;
     }
 
     if (trigger) trigger.addEventListener('click', show);
@@ -693,6 +800,8 @@
     if (outsideCloses && scrim) {
       scrim.addEventListener('click', hide);
     }
+
+    trapTab(box, () => open);
 
     const api = { show, hide, isOpen: () => open, escCloses, stage, onEsc: escCloses ? hide : null };
     return api;
@@ -727,7 +836,9 @@
       scrim: $('#modalScrim'),
       box: $('#modalBox'),
       trigger: $('#modalOpen'),
-      onOpen: () => setTimeout(() => $('#projName').select(), 180),
+      initialFocus: '#projName',
+      // 立刻全选，别再延时抢焦点：用户在这 180ms 内按 Tab 会被拽回来
+      onOpen: () => $('#projName').select(),
     });
     $$('[data-close="modal"]').forEach(b => b.addEventListener('click', ov.hide));
     overlays.modal = ov;
@@ -745,13 +856,8 @@
       trigger: $('#alertOpen'),
       escCloses: false,      // 关键：Esc 关不掉
       outsideCloses: false,  // 点外面也关不掉
-      onOpen: () => {
-        result.textContent = '';
-        setTimeout(() => {
-          const cancel = $('[data-close="alert"]', $('#alertBox'));
-          if (cancel) cancel.focus({ preventScroll: true });
-        }, 180);
-      },
+      initialFocus: '[data-close="alert"]',
+      onOpen: () => { result.textContent = ''; },
     });
 
     $$('[data-close="alert"]').forEach(b => {
@@ -786,6 +892,7 @@
       scrim: $('#drawerScrim'),
       box: $('#drawerBox'),
       trigger: $('#drawerOpen'),
+      initialFocus: '#drawerName',
     });
     $$('[data-close="drawer"]').forEach(b => b.addEventListener('click', ov.hide));
     overlays.drawer = ov;
@@ -804,7 +911,9 @@
       scrim: $('#sheetScrim'),
       box,
       trigger: $('#sheetOpen'),
+      initialFocus: '[data-close="sheet"]',
     });
+    $$('[data-close="sheet"]').forEach(b => b.addEventListener('click', ov.hide));
     overlays.sheet = ov;
 
     // 往下拖一点就关
@@ -845,6 +954,7 @@
       scrim: $('#actionScrim'),
       box,
       trigger: $('#actionOpen'),
+      initialFocus: '.action-sheet__item',
     });
     $$('[data-close="action"]').forEach(b => b.addEventListener('click', ov.hide));
     $$('.action-sheet__item', box).forEach(b => {
@@ -898,30 +1008,36 @@
     let cur = 0;
     let lastFocus = null;
 
+    box.inert = true;
+    trapTab(box, () => box.classList.contains('is-open'));
+
     function paint() {
       img.src = make(cur, 1200, 800);
       img.alt = art[cur].t + ' — ' + art[cur].s;
       count.textContent = `${cur + 1} / ${art.length}`;
     }
 
-    function open(i) {
+    function open(i, trigger) {
       cur = i;
-      lastFocus = document.activeElement;
+      lastFocus = focusOrigin(trigger);
       paint();
+      box.inert = false;
       box.classList.add('is-open');
       box.setAttribute('aria-hidden', 'false');
       $('#lbClose').focus({ preventScroll: true });
     }
     function close() {
+      if (!box.classList.contains('is-open')) return;
       box.classList.remove('is-open');
       box.setAttribute('aria-hidden', 'true');
+      box.inert = true;
       if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
     }
     function step(d) { cur = (cur + d + art.length) % art.length; paint(); }
 
     strip.addEventListener('click', e => {
       const t = e.target.closest('.thumb');
-      if (t) open(Number(t.dataset.i));
+      if (t) open(Number(t.dataset.i), t);
     });
     $('#lbClose').addEventListener('click', close);
     $('#lbPrev').addEventListener('click', () => step(-1));
@@ -931,11 +1047,11 @@
     // 只在这个舞台有焦点时接管方向键
     document.addEventListener('keydown', e => {
       if (!box.classList.contains('is-open')) return;
+      if (e.key === 'Escape') { e.preventDefault(); close(); return; }
       const inStage = e.target.closest && e.target.closest('#stage-lightbox');
       if (!inStage && e.target !== document.body) return;
       if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
       if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
-      if (e.key === 'Escape') { e.preventDefault(); close(); }
     });
   }
 
@@ -968,9 +1084,14 @@
     let open = false;
     let lastFocus = null;
 
+    box.inert = true;
+    input.setAttribute('aria-expanded', 'false');
+    trapTab(box, () => open);
+
     function paint() {
       if (!filtered.length) {
         list.innerHTML = '<div class="palette__empty">没有匹配的命令</div>';
+        input.removeAttribute('aria-activedescendant');
         return;
       }
       let html = '';
@@ -979,13 +1100,14 @@
         if (c.group !== lastGroup) {
           lastGroup = c.group;
         }
-        html += `<div class="palette__item${i === active ? ' is-active' : ''}" role="option" data-i="${i}">` +
+        html += `<div class="palette__item${i === active ? ' is-active' : ''}" role="option" id="palette-opt-${i}" aria-selected="${i === active}" data-i="${i}">` +
           `<svg viewBox="0 0 24 24"><use href="#i-${c.icon}"/></svg>` +
           `<span>${c.label}</span>` +
           (c.hint ? `<kbd>${c.hint}</kbd>` : '') +
           `</div>`;
       });
       list.innerHTML = html;
+      input.setAttribute('aria-activedescendant', 'palette-opt-' + active);
       const el = $('.palette__item.is-active', list);
       if (el) el.scrollIntoView({ block: 'nearest' });
     }
@@ -1000,12 +1122,14 @@
     function show() {
       if (open) return;
       open = true;
-      lastFocus = document.activeElement;
+      lastFocus = focusOrigin($('#paletteOpen'));
+      box.inert = false;
       scrim.classList.add('is-open');
       box.classList.add('is-open');
+      input.setAttribute('aria-expanded', 'true');
       input.value = '';
       filter();
-      setTimeout(() => input.focus({ preventScroll: true }), 60);
+      setTimeout(() => { if (open) input.focus({ preventScroll: true }); }, 60);
     }
 
     function hide() {
@@ -1013,6 +1137,9 @@
       open = false;
       scrim.classList.remove('is-open');
       box.classList.remove('is-open');
+      box.inert = true;
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
       if (lastFocus && document.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
     }
 
@@ -1053,6 +1180,11 @@
 
     // 全局 ⌘K / Ctrl K
     document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && open) {
+        e.preventDefault();
+        hide();
+        return;
+      }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         if (open) { hide(); }
@@ -1098,22 +1230,29 @@
   function initPopover() {
     const stage = $('#stage-popover');
     if (!stage) return;
-    const anchor = $('#popoverAnchor');
     const btn = $('#popoverBtn');
     const box = $('#popoverBox');
+
+    box.inert = true;
 
     function toggle() {
       const isOpen = box.classList.contains('is-open');
       if (isOpen) { close(); return; }
+      box.inert = false;
       box.classList.add('is-open');
-      placeNear(stage, box, anchor, { side: 'bottom', align: 'start', gap: 8 });
+      // 用按钮本身量位置：外面那层 inline span 的行盒会比按钮高，容易压住触发按钮
+      placeNear(stage, box, btn, { side: 'bottom', align: 'start', gap: 8 });
       btn.setAttribute('aria-expanded', 'true');
       stage.__openPopover = true;
     }
     function close() {
+      if (!box.classList.contains('is-open')) return;
+      const inside = box.contains(document.activeElement);
       box.classList.remove('is-open');
+      box.inert = true;
       btn.setAttribute('aria-expanded', 'false');
       stage.__openPopover = false;
+      if (inside) btn.focus({ preventScroll: true });
     }
 
     btn.addEventListener('click', e => { e.stopPropagation(); toggle(); });
@@ -1127,8 +1266,9 @@
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && box.classList.contains('is-open')) {
-        const inStage = e.target.closest && e.target.closest('#stage-popover');
-        if (inStage) { close(); btn.focus({ preventScroll: true }); }
+        e.preventDefault();
+        close();
+        btn.focus({ preventScroll: true });
       }
     });
   }
@@ -1140,19 +1280,31 @@
   function initPopconfirm() {
     const stage = $('#stage-popconfirm');
     if (!stage) return;
-    const anchor = $('#pcAnchor');
     const btn = $('#pcBtn');
     const box = $('#pcBox');
     const result = $('#pcResult');
 
-    function close() { box.classList.remove('is-open'); }
+    box.inert = true;
+    btn.setAttribute('aria-expanded', 'false');
+
+    function close() {
+      if (!box.classList.contains('is-open')) return;
+      const inside = box.contains(document.activeElement);
+      box.classList.remove('is-open');
+      box.inert = true;
+      btn.setAttribute('aria-expanded', 'false');
+      if (inside) btn.focus({ preventScroll: true });
+    }
 
     btn.addEventListener('click', e => {
       e.stopPropagation();
       if (box.classList.contains('is-open')) { close(); return; }
+      box.inert = false;
       box.classList.add('is-open');
-      placeNear(stage, box, anchor, { side: 'bottom', align: 'start', gap: 8 });
+      placeNear(stage, box, btn, { side: 'bottom', align: 'start', gap: 8 });
+      btn.setAttribute('aria-expanded', 'true');
       setTimeout(() => {
+        if (!box.classList.contains('is-open')) return;
         const c = $('[data-pc="no"]', box);
         if (c) c.focus({ preventScroll: true });
       }, 140);
@@ -1174,10 +1326,9 @@
 
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && box.classList.contains('is-open')) {
-        if (e.target.closest && e.target.closest('#stage-popconfirm')) {
-          close();
-          btn.focus({ preventScroll: true });
-        }
+        e.preventDefault();
+        close();
+        btn.focus({ preventScroll: true });
       }
     });
   }
@@ -1191,34 +1342,66 @@
     if (!stage) return;
     const anchor = $('#hoverAnchor');
     const box = $('#heroBox');
+    // 触屏没有「移开」这个动作，点击必须变成开关；鼠标点击则不该把悬停打开的卡关掉
+    const canHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     let enter = null;
     let leave = null;
 
+    box.inert = true;
+    anchor.setAttribute('aria-expanded', 'false');
+
     const open = () => {
+      clearTimeout(leave);
+      box.inert = false;
       box.classList.add('is-open');
       placeNear(stage, box, anchor, { side: 'bottom', align: 'start', gap: 10 });
+      anchor.setAttribute('aria-expanded', 'true');
     };
-    const close = () => box.classList.remove('is-open');
+    const close = () => {
+      if (!box.classList.contains('is-open')) return;
+      box.classList.remove('is-open');
+      box.inert = true;
+      anchor.setAttribute('aria-expanded', 'false');
+    };
 
+    // 触屏浏览器在 tap 后会补发 mouseenter/mouseleave；若照单全收，第二次 tap 关掉的卡
+    // 会被 380ms 的 hover 定时器重新打开。触屏只认 click 开关，不理会合成的鼠标事件。
     anchor.addEventListener('mouseenter', () => {
+      if (!canHover) return;
       clearTimeout(leave);
       enter = setTimeout(open, 380);
     });
     anchor.addEventListener('mouseleave', () => {
+      if (!canHover) return;
       clearTimeout(enter);
       leave = setTimeout(() => {
         if (!box.matches(':hover')) close();
       }, 220);
     });
-    box.addEventListener('mouseenter', () => clearTimeout(leave));
-    box.addEventListener('mouseleave', () => { leave = setTimeout(close, 200); });
+    box.addEventListener('mouseenter', () => { if (canHover) clearTimeout(leave); });
+    box.addEventListener('mouseleave', () => {
+      if (!canHover) return;
+      leave = setTimeout(close, 200);
+    });
 
-    // 键盘 / 触屏兜底
-    anchor.addEventListener('focus', open);
-    anchor.addEventListener('blur', close);
+    // 键盘：Tab 聚焦时立刻打开，移走焦点关闭
+    anchor.addEventListener('focus', () => {
+      if (anchor.matches(':focus-visible')) open();
+    });
+    anchor.addEventListener('blur', () => {
+      if (!box.matches(':hover')) close();
+    });
     anchor.addEventListener('click', e => {
       e.preventDefault();
-      box.classList.contains('is-open') ? close() : open();
+      clearTimeout(enter);
+      if (!box.classList.contains('is-open')) { open(); return; }
+      if (!canHover) close();
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) {
+        e.preventDefault();
+        close();
+      }
     });
   }
 
@@ -1229,22 +1412,30 @@
   function initDropdown() {
     const stage = $('#stage-dropdown');
     if (!stage) return;
-    const anchor = $('#ddAnchor');
     const btn = $('#ddBtn');
     const box = $('#ddBox');
 
+    box.inert = true;
+
     const close = () => {
+      if (!box.classList.contains('is-open')) return;
+      const inside = box.contains(document.activeElement);
       box.classList.remove('is-open');
+      box.inert = true;
       btn.setAttribute('aria-expanded', 'false');
+      if (inside) btn.focus({ preventScroll: true });
     };
 
     btn.addEventListener('click', e => {
       e.stopPropagation();
       if (box.classList.contains('is-open')) { close(); return; }
+      box.inert = false;
       box.classList.add('is-open');
-      placeNear(stage, box, anchor, { side: 'bottom', align: 'end', gap: 6 });
+      // 贴身按钮量位置，别用外层 inline span（行盒更高，菜单会压住按钮）
+      placeNear(stage, box, btn, { side: 'bottom', align: 'end', gap: 6 });
       btn.setAttribute('aria-expanded', 'true');
       setTimeout(() => {
+        if (!box.classList.contains('is-open')) return;
         const first = $('.menu__item', box);
         if (first) first.focus({ preventScroll: true });
       }, 120);
@@ -1267,6 +1458,13 @@
       if (e.key === 'ArrowUp') { e.preventDefault(); items[(i - 1 + items.length) % items.length].focus(); }
       if (e.key === 'Escape') { e.preventDefault(); close(); btn.focus({ preventScroll: true }); }
     });
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) {
+        e.preventDefault();
+        close();
+      }
+    });
   }
 
   /* ------------------------------------------------------------
@@ -1279,20 +1477,44 @@
     const area = $('#ctxArea');
     const box = $('#ctxBox');
 
-    const close = () => {
+    box.inert = true;
+
+    function close() {
+      if (!box.classList.contains('is-open')) return;
+      const inside = box.contains(document.activeElement);
       box.classList.remove('is-open');
+      box.inert = true;
       area.classList.remove('is-hit');
-    };
+      area.setAttribute('aria-expanded', 'false');
+      if (inside) area.focus({ preventScroll: true });
+    }
+
+    function openAt(x, y) {
+      const sr = stage.getBoundingClientRect();
+      box.inert = false;
+      box.classList.add('is-open');
+      area.classList.add('is-hit');
+      area.setAttribute('aria-expanded', 'true');
+      box.style.left = Math.max(8, Math.min(x - sr.left, sr.width - box.offsetWidth - 8)) + 'px';
+      box.style.top = Math.max(8, Math.min(y - sr.top, sr.height - box.offsetHeight - 8)) + 'px';
+      box.style.right = 'auto';
+      box.style.bottom = 'auto';
+      const first = $('.menu__item', box);
+      if (first) first.focus({ preventScroll: true });
+    }
 
     area.addEventListener('contextmenu', e => {
       e.preventDefault();
-      const sr = stage.getBoundingClientRect();
-      box.classList.add('is-open');
-      area.classList.add('is-hit');
-      box.style.left = Math.min(e.clientX - sr.left, sr.width - box.offsetWidth - 8) + 'px';
-      box.style.top = Math.min(e.clientY - sr.top, sr.height - box.offsetHeight - 8) + 'px';
-      box.style.right = 'auto';
-      box.style.bottom = 'auto';
+      openAt(e.clientX, e.clientY);
+    });
+
+    // 键盘入口：菜单键 / Shift+F10。不能只让右键用户用得上
+    area.addEventListener('keydown', e => {
+      if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
+        e.preventDefault();
+        const r = area.getBoundingClientRect();
+        openAt(r.left + 24, r.top + 24);
+      }
     });
 
     $$('.menu__item', box).forEach(item => {
@@ -1308,7 +1530,10 @@
       if (!box.contains(e.target)) close();
     });
     document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') close();
+      if (e.key === 'Escape' && box.classList.contains('is-open')) {
+        e.preventDefault();
+        close();
+      }
     });
   }
 
@@ -1335,6 +1560,9 @@
     const nextBtn = $('#tourNext');
     const startBtn = $('#tourStart');
 
+    pop.inert = true;
+    trapTab(pop, () => pop.classList.contains('is-open'));
+
     let i = 0;
     function paint() {
       const s = steps[i];
@@ -1360,17 +1588,22 @@
 
     function start() {
       i = 0;
+      pop.inert = false;
       mask.classList.add('is-on');
       pop.classList.add('is-open');
       startBtn.style.display = 'none';
       paint();
+      nextBtn.focus({ preventScroll: true });
     }
 
     function end() {
+      const wasOpen = pop.classList.contains('is-open');
       mask.classList.remove('is-on');
       pop.classList.remove('is-open');
+      pop.inert = true;
       $$('.tour-bar', stage).forEach(b => b.classList.remove('is-spot'));
       startBtn.style.display = '';
+      if (wasOpen) startBtn.focus({ preventScroll: true });
     }
 
     startBtn.addEventListener('click', start);
@@ -1379,6 +1612,13 @@
       if (i === steps.length - 1) { end(); return; }
       i++;
       paint();
+      nextBtn.focus({ preventScroll: true });
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && pop.classList.contains('is-open')) {
+        e.preventDefault();
+        end();
+      }
     });
   }
 
@@ -1392,7 +1632,10 @@
     const anchor = $('#coachAnchor');
     const box = $('#coachBox');
 
+    box.inert = true;
+
     function open() {
+      box.inert = false;
       box.classList.add('is-open');
       stage.classList.add('is-coached');
       placeNear(stage, box, anchor, { side: 'top', align: 'start', gap: 12 });
@@ -1403,8 +1646,12 @@
       box.style.setProperty('--tip-x', tip + 'px');
     }
     function close() {
+      if (!box.classList.contains('is-open')) return;
+      const inside = box.contains(document.activeElement);
       box.classList.remove('is-open');
+      box.inert = true;
       stage.classList.remove('is-coached');
+      if (inside) $('#coachTarget').focus({ preventScroll: true });
     }
 
     $('#coachTarget').addEventListener('click', () => {
@@ -1414,6 +1661,12 @@
     $('#coachSkip').addEventListener('click', close);
     $('#coachOk').addEventListener('click', close);
     $('#coachReset').addEventListener('click', open);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && box.classList.contains('is-open')) {
+        e.preventDefault();
+        close();
+      }
+    });
 
     // 初次进入时出现一次
     const io = new IntersectionObserver(entries => {

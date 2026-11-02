@@ -95,6 +95,13 @@
 
 .inp::placeholder { color: #9aa8b5; }
 
+/* 自绘清空按钮，别和 Chromium 的原生搜索叉号叠在一起 */
+.inp[type="search"]::-webkit-search-cancel-button,
+.inp[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 .inp:hover { border-color: #a9b6c1; }
 
 .inp:focus {
@@ -159,6 +166,7 @@
 }
 
 .inp-wrap__btn:hover { background: var(--paper); color: var(--ink); }
+.inp-wrap__btn[hidden] { display: none; }
 
 .inp-wrap__icon {
   position: absolute;
@@ -409,6 +417,7 @@
   gap: 18px;
   width: 100%;
   max-width: 320px;
+  cursor: pointer;
   text-align: left;
 }
 
@@ -424,9 +433,9 @@
 .switch {
   position: relative;
   flex: none;
-  width: 38px;
-  height: 22px;
-  border-radius: 11px;
+  width: 40px;
+  height: 24px;
+  border-radius: 12px;
   border: none;
   background: #c6d0d9;
   cursor: pointer;
@@ -439,8 +448,8 @@
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 3px rgba(19, 28, 38, 0.3);
@@ -850,6 +859,12 @@
   background: var(--danger-bg);
   border-color: #ecc3bf;
   color: #7d1d16;
+  cursor: pointer;
+}
+
+.opti-item.is-failed:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .opti-item.is-failed .opti-item__dot { background: var(--danger); }

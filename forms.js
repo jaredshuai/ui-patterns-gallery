@@ -208,6 +208,15 @@
         out.textContent = `${label}已${now ? '开启' : '关闭'} · 改动已保存`;
       });
     });
+
+    // 设置项文字也在点击热区里；只点小开关不该是唯一入口
+    $$('.switch-row').forEach(row => {
+      row.addEventListener('click', e => {
+        if (e.target.closest('.switch')) return;
+        const sw = $('.switch', row);
+        if (sw) sw.click();
+      });
+    });
   }
 
   /* ------------------------------------------------------------
@@ -335,6 +344,12 @@
       const el = outOf(k);
       el.className = 'vt__state' + (kind ? ' is-' + kind : '');
       el.textContent = text;
+      // 错误不能只靠颜色：把 invalid 状态也告诉读屏
+      const input = $(`[data-vt="${k}"]`);
+      if (input) {
+        if (kind === 'err') input.setAttribute('aria-invalid', 'true');
+        else input.removeAttribute('aria-invalid');
+      }
     };
 
     const check = (k, input, onlyIfTouched) => {
@@ -622,12 +637,25 @@
           row.className = 'opti-item is-failed';
           row.querySelector('.opti-item__txt').textContent = title + ' · 未保存';
           status.textContent = `「${title}」没保存成功，已标红。点一下可以移除。`;
-          row.addEventListener('click', () => {
-            if (!row.classList.contains('is-failed')) return;
+          // 可点就要可聚焦：键盘用户也得能移除失败项
+          row.tabIndex = 0;
+          row.setAttribute('role', 'button');
+          row.setAttribute('aria-label', title + ' · 未保存，按回车移除');
+          let removed = false;
+          const remove = () => {
+            if (removed) return;
+            removed = true;
             row.classList.add('is-out');
             setTimeout(() => row.remove(), reduceMotion ? 0 : 200);
             status.textContent = '已移除失败的那一条，其余不受影响。';
-          }, { once: true });
+          };
+          row.addEventListener('click', remove);
+          row.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              remove();
+            }
+          });
         } else {
           row.classList.remove('is-pending');
           status.textContent = `「${title}」已同步。`;
@@ -722,7 +750,7 @@
      ------------------------------------------------------------ */
 
   function initDropzone() {
-    const zone = $('#dropzone');
+    const zone = $('#dropzoneArea');
     const list = $('#fileList');
     if (!zone) return;
 
@@ -739,11 +767,14 @@
       Array.from(files).forEach(f => {
         const row = document.createElement('div');
         row.className = 'file-row';
+        // 文件名来自拖拽/文件系统，不能拼进 innerHTML
         row.innerHTML =
           `<svg viewBox="0 0 24 24" style="width:13px;height:13px;stroke:var(--ink-3);fill:none;stroke-width:1.6;flex:none">`
           + `<use href="#i-folder"/></svg>`
-          + `<span class="file-row__name">${f.name || '未命名文件'}</span>`
-          + `<span class="file-row__size">${fmt(f.size || 0)}</span>`;
+          + '<span class="file-row__name"></span>'
+          + '<span class="file-row__size"></span>';
+        $('.file-row__name', row).textContent = f.name || '未命名文件';
+        $('.file-row__size', row).textContent = fmt(f.size || 0);
 
         const bar = document.createElement('div');
         bar.className = 'file-row__bar';
@@ -812,7 +843,7 @@
      ------------------------------------------------------------ */
 
   function initSlider() {
-    const slider = $('#slider');
+    const slider = $('#sliderInput');
     const val = $('#slVal');
     const preview = $('#slPreview');
     if (!slider) return;
@@ -878,6 +909,7 @@
   function initSearchInput() {
     const input = $('#searchDemo');
     const log = $('#searchLog');
+    const clear = $('#searchClear');
     if (!input) return;
 
     let timer = null;
@@ -887,6 +919,7 @@
     input.addEventListener('input', () => {
       skipped++;
       clearTimeout(timer);
+      if (clear) clear.hidden = !input.value;
       log.textContent = `输入中… 已敲 ${skipped} 下，等待停止`;
 
       timer = setTimeout(() => {
@@ -901,6 +934,16 @@
           + `共敲了 ${skipped} 下，只发了 ${fired} 次请求`;
       }, 300);
     });
+
+    if (clear) {
+      clear.addEventListener('click', () => {
+        clearTimeout(timer);
+        input.value = '';
+        clear.hidden = true;
+        log.textContent = '等待输入';
+        input.focus({ preventScroll: true });
+      });
+    }
   }
 
   /* ------------------------------------------------------------
