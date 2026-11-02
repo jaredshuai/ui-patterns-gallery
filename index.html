@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>界面模式图鉴</title>
-<meta name="description" content="25 个界面模式的中文图鉴：每个概念都有可交互的真实演示，以及和邻近概念的区分要点。">
+<meta name="description" content="46 个界面模式的中文图鉴，分浮层、表单与输入两卷：每个概念都有可交互的真实演示，以及和邻近概念的区分要点。">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="forms.css">
 </head>
@@ -739,11 +739,12 @@
         </div>
       </div>
       <div class="stagewrap">
-        <div class="stage" id="stage-palette">
+        <!-- tabindex=-1：点一下舞台空白处就能让焦点落进来，⌘K 只在舞台内生效 -->
+        <div class="stage" id="stage-palette" tabindex="-1">
           <div class="stage__grid"></div>
           <div class="stage__body">
             <div class="demo-center">
-              <p class="try">在舞台里按 ⌘K / Ctrl K，或者直接点按钮</p>
+              <p class="try">先点一下这块舞台，再按 ⌘K / Ctrl K；或者直接点按钮</p>
               <button class="btn" id="paletteOpen">打开命令面板</button>
               <p id="paletteResult" style="font-size:12.5px;color:var(--ink-3);height:18px"></p>
             </div>
@@ -1021,7 +1022,7 @@
         <p class="spec__def">压暗整个界面，只把当前这一步要讲的那个元素照亮，旁边配一个带「下一步」的气泡。走完三步五步，用户对这块功能的骨架就有了印象。它是一条有顺序的路径，所以必须有明确的进度（1 / 3）、一个「跳过」，以及随时能退出的关闭。</p>
         <div class="diff">
           <span class="diff__label">容易混淆</span>
-          <p>和 Coachmark 的差别是「步数」：Coachmark 是一次一句，指向单个新功能；Tour 是多步、有先后、走完才算结束。和 Tooltip 的差别是「主动与被動」：Tooltip 等用户来悬停，Tour 是产品主动推给用户。Tour 只在第一次使用时出现，如果用户跳过，不该每次登录都再弹一次 —— 那是把引导变成了骚扰。</p>
+          <p>和 Coachmark 的差别是「步数」：Coachmark 是一次一句，指向单个新功能；Tour 是多步、有先后、走完才算结束。和 Tooltip 的差别是「主动与被动」：Tooltip 等用户来悬停，Tour 是产品主动推给用户。Tour 只在第一次使用时出现，如果用户跳过，不该每次登录都再弹一次 —— 那是把引导变成了骚扰。</p>
         </div>
         <div class="xref"><span class="xref__label">对照看</span><a href="#coachmark">Coachmark</a><a href="#tooltip">Tooltip</a></div>
         <div class="meta">
@@ -1444,7 +1445,7 @@
         <p class="spec__def">同一个校验规则，在三个时刻执行，体验完全不同：输入时（每敲一个字符就判）、失焦时（离开这一栏才判）、提交时（统一判）。三者的差别不是技术难度，是用户会不会觉得被盯着。</p>
         <div class="diff">
           <span class="diff__label">容易混淆</span>
-          <p>常见误区是把「实时校验」当成最好的。实际上边打字边报错最糟 —— 你刚开始输入 <code>a</code>，它就说「邮箱格式不正确」。稳妥的组合是：**首次失焦时校验，之后改成实时**。这样用户第一次填完才被告知，改的时候又能立刻看到好转。提交时仍然要再校验一遍，因为用户可以绕过 blur。</p>
+          <p>常见误区是把「实时校验」当成最好的。实际上边打字边报错最糟 —— 你刚开始输入 <code>a</code>，它就说「邮箱格式不正确」。稳妥的组合是：<strong>首次失焦时校验，之后改成实时</strong>。这样用户第一次填完才被告知，改的时候又能立刻看到好转。提交时仍然要再校验一遍，因为用户可以绕过 blur。</p>
         </div>
         <div class="xref"><span class="xref__label">对照看</span><a href="#error-summary">错误摘要</a><a href="#inline-alert">Inline alert</a></div>
         <div class="meta">

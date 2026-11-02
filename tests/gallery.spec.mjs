@@ -606,6 +606,33 @@ test.describe('移动端', () => {
   });
 });
 
+test('打开首页停在顶部，不会被隐藏的命令面板拽走', async ({ page }) => {
+  await page.goto('/');
+  await page.waitForTimeout(600);
+  await settleScroll(page);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page.locator('#vol-overlay .lede h1')).toBeInViewport();
+});
+
+test('⌘K / Ctrl K 只在命令面板舞台内生效', async ({ page }) => {
+  await page.goto('/');
+  // 焦点在页面别处（顶部搜索框）时，不接管浏览器快捷键
+  await page.locator('#search').focus();
+  await page.keyboard.press('Control+k');
+  await page.waitForTimeout(300);
+  await expect(page.locator('#paletteBox')).not.toHaveClass(/is-open/);
+
+  // 点一下舞台空白处，焦点进入舞台后就能唤起
+  await page.goto('/#command-palette');
+  await settleScroll(page);
+  await page.locator('#stage-palette').click({ position: { x: 12, y: 12 } });
+  await page.keyboard.press('Control+k');
+  await expect(page.locator('#paletteBox')).toHaveClass(/is-open/);
+  await expect(page.locator('#paletteInput')).toBeFocused();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#paletteBox')).not.toHaveClass(/is-open/);
+});
+
 test('页面运行时没有未捕获脚本错误', async ({ page }) => {
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));

@@ -76,8 +76,14 @@
 
       if (active >= 0) {
         input.setAttribute('aria-activedescendant', 'cb-opt-' + active);
+        // 只滚列表自己：scrollIntoView 会连带滚动窗口
         const el = $(`#cb-opt-${active}`, list);
-        if (el) el.scrollIntoView({ block: 'nearest' });
+        if (el) {
+          const lr = list.getBoundingClientRect();
+          const er = el.getBoundingClientRect();
+          if (er.top < lr.top) list.scrollTop -= lr.top - er.top;
+          else if (er.bottom > lr.bottom) list.scrollTop += er.bottom - lr.bottom;
+        }
       } else {
         input.removeAttribute('aria-activedescendant');
       }

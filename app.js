@@ -9,6 +9,15 @@
   const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // 只滚列表自己，不碰窗口。scrollIntoView 会连带滚动所有祖先 —— 隐藏的命令面板在初始化时
+  // 调它，曾把整页从顶部拽到 Lightbox 附近（约 11000px）。
+  function keepInList(list, el) {
+    const lr = list.getBoundingClientRect();
+    const er = el.getBoundingClientRect();
+    if (er.top < lr.top) list.scrollTop -= lr.top - er.top;
+    else if (er.bottom > lr.bottom) list.scrollTop += er.bottom - lr.bottom;
+  }
+
   /* ------------------------------------------------------------
      0. 索引导航 + 搜索
      ------------------------------------------------------------ */
@@ -1109,7 +1118,7 @@
       list.innerHTML = html;
       input.setAttribute('aria-activedescendant', 'palette-opt-' + active);
       const el = $('.palette__item.is-active', list);
-      if (el) el.scrollIntoView({ block: 'nearest' });
+      if (el && open) keepInList(list, el);
     }
 
     function filter() {
@@ -1178,7 +1187,7 @@
       if (item) run(Number(item.dataset.i));
     });
 
-    // 全局 ⌘K / Ctrl K
+    // ⌘K / Ctrl K 只在焦点落在这块舞台里时接管。整页拦截会吞掉浏览器自己的 Ctrl K（聚焦地址栏/搜索框）。
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape' && open) {
         e.preventDefault();
@@ -1186,12 +1195,10 @@
         return;
       }
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        if (!open && !stage.contains(document.activeElement)) return;
         e.preventDefault();
-        if (open) { hide(); }
-        else {
-          stage.scrollIntoView({ block: 'center', behavior: reduceMotion ? 'auto' : 'smooth' });
-          setTimeout(show, reduceMotion ? 0 : 260);
-        }
+        if (open) hide();
+        else show();
       }
     });
 
