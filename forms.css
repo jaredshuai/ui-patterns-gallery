@@ -551,6 +551,9 @@
    8. Password
    -------------------------------------------------------------------------- */
 
+/* 演示用的是自建眼睛按钮，隐藏 Edge 自带的那个，免得出现两个 */
+#pwd::-ms-reveal { display: none; }
+
 .pwd-strength {
   display: flex;
   gap: 3px;
@@ -1177,6 +1180,63 @@
   align-items: center;
   gap: 12px;
   width: 100%;
+}
+
+/* --------------------------------------------------------------------------
+   Date input：三栏 vs 原生选择器
+   -------------------------------------------------------------------------- */
+
+.date-cmp {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  max-width: 320px;
+  text-align: left;
+}
+
+.date-fs { border: none; margin: 0; padding: 0; min-width: 0; }
+
+.date-fs legend { padding: 0; }
+
+.date3 { display: flex; gap: 8px; }
+
+.date3__f {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 56px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+
+.date3__f--y { width: 80px; }
+
+.date3__f .inp { text-align: center; font-family: var(--font-mono); padding: 0 6px; }
+
+/* --------------------------------------------------------------------------
+   Character count：多行文本框
+   -------------------------------------------------------------------------- */
+
+.inp--area {
+  height: auto;
+  min-height: 56px;
+  padding: 8px 10px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+/* 读屏可读、视觉隐藏 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* --------------------------------------------------------------------------

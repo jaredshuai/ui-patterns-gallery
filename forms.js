@@ -241,9 +241,9 @@
       const total = children.length;
 
       parent.checked = n === total;
-      // indeterminate 不是 HTML 属性，只能这样设
+      // indeterminate 不是 HTML 属性，只能这样设；原生复选框会自动把它暴露成「部分选中」，
+      // 不要再叠 aria-checked —— 那是给自建 role="checkbox" 用的
       parent.indeterminate = n > 0 && n < total;
-      parent.setAttribute('aria-checked', n === total ? 'true' : n === 0 ? 'false' : 'mixed');
 
       out.textContent = n === 0 ? '未选任何通知' : `已选 ${n} 项`;
     }
@@ -397,7 +397,7 @@
       }
     });
 
-    // 首次失焦后切实时（推荐做法），这里不做，保持对照，只提示
+    // 首次失焦后转为实时（推荐做法，等同 React Hook Form 的 mode: 'onTouched'）
     blur.addEventListener('input', () => {
       if (blurTouched) check('blur', blur, false);
     });
@@ -579,6 +579,14 @@
     const btn = $('#dsSubmit');
     const out = $('#dsResult');
     if (!btn) return;
+
+    // aria-disabled 只改语义，不改行为：打字、粘贴、拖放都得自己拦
+    const aria = $('#dsAria');
+    ['beforeinput', 'paste', 'drop'].forEach(type => {
+      aria.addEventListener(type, e => {
+        if (aria.getAttribute('aria-disabled') === 'true') e.preventDefault();
+      });
+    });
 
     btn.addEventListener('click', () => {
       // 用 FormData 模拟真实提交：disabled 的字段根本不会出现
@@ -909,6 +917,146 @@
   }
 
   /* ------------------------------------------------------------
+     19b. Date input —— 三栏输入 vs 原生日期选择器
+     ------------------------------------------------------------ */
+
+  function initDateInput() {
+    const group = $('#dobGroup');
+    if (!group) return;
+
+    const d = $('#dobD');
+    const m = $('#dobM');
+    const y = $('#dobY');
+    const out = $('#dobOut');
+    const fields = [d, m, y];
+    const NAMES = ['日', '月', '年'];
+    let touched = false;
+
+    const setMsg = (kind, text, bad) => {
+      out.textContent = text;
+      out.className = 'fi__msg fi__msg--' + kind;
+      fields.forEach(f => {
+        const isBad = bad.includes(f);
+        f.classList.toggle('is-error', isBad);
+        if (isBad) f.setAttribute('aria-invalid', 'true');
+        else f.removeAttribute('aria-invalid');
+      });
+    };
+
+    function check() {
+      const vals = fields.map(f => f.value.trim());
+      if (vals.every(v => !v)) {
+        setMsg('hint', '例如 30 · 2 · 1990，试试这个不存在的日期', []);
+        return;
+      }
+      // 先报「缺什么」，只标缺的那几栏
+      const missing = fields.filter((f, i) => !vals[i]);
+      if (missing.length) {
+        setMsg('error', '出生日期还缺' + missing.map(f => NAMES[fields.indexOf(f)]).join('、'), missing);
+        return;
+      }
+      const [dd, mm, yy] = vals.map(Number);
+      const thisYear = new Date().getFullYear();
+      if (!Number.isInteger(yy) || yy < 1900 || yy > thisYear) {
+        setMsg('error', `年份要在 1900 到 ${thisYear} 之间`, [y]);
+        return;
+      }
+      if (!Number.isInteger(mm) || mm < 1 || mm > 12) {
+        setMsg('error', '月份要在 1 到 12 之间', [m]);
+        return;
+      }
+      // 用 Date 自己回推一遍，2 月 30 日这种会被「进位」成 3 月，借此判断真假
+      const date = new Date(yy, mm - 1, dd);
+      if (!Number.isInteger(dd) || date.getDate() !== dd || date.getMonth() !== mm - 1) {
+        setMsg('error', `${yy} 年 ${mm} 月没有 ${dd} 日，必须是真实存在的日期`, [d]);
+        return;
+      }
+      if (date > new Date()) {
+        setMsg('error', '出生日期必须在今天之前', fields);
+        return;
+      }
+      setMsg('ok', `已识别：${yy} 年 ${mm} 月 ${dd} 日`, []);
+    }
+
+    // 只收数字；不自动跳格 —— 与 OTP 的行为刻意相反
+    fields.forEach(f => {
+      f.addEventListener('input', () => {
+        f.value = f.value.replace(/\D/g, '');
+        if (touched) check();
+      });
+    });
+
+    // 焦点离开整组时才第一次校验（首次失焦、之后实时）
+    group.addEventListener('focusout', e => {
+      if (group.contains(e.relatedTarget)) return;
+      touched = true;
+      check();
+    });
+
+    const trip = $('#tripDate');
+    const tripOut = $('#tripOut');
+    const WEEK = '日一二三四五六';
+    trip.addEventListener('change', () => {
+      if (!trip.value) { tripOut.textContent = '提交值：（未选）'; return; }
+      // value 永远是 yyyy-mm-dd，与界面上显示的格式无关
+      const [yy, mm, dd] = trip.value.split('-').map(Number);
+      const wd = new Date(yy, mm - 1, dd).getDay();
+      tripOut.textContent = `提交值：${trip.value}（星期${WEEK[wd]}）`;
+    });
+  }
+
+  /* ------------------------------------------------------------
+     19c. Character count —— 超出就提醒，不截断
+     ------------------------------------------------------------ */
+
+  function initCharCount() {
+    const good = $('#ccGood');
+    if (!good) return;
+
+    const LIMIT = 40;
+    const count = $('#ccGoodCount');
+    const live = $('#ccGoodLive');
+    const bad = $('#ccBad');
+    const badNote = $('#ccBadNote');
+    let speak = null;
+
+    // 按字符而不是 UTF-16 码元计数，emoji 不会被算成两个字
+    const len = s => Array.from(s).length;
+
+    function paint() {
+      const left = LIMIT - len(good.value);
+      const text = left >= 0 ? `还可以输入 ${left} 个字` : `超出 ${-left} 个字，提交前请删减`;
+      count.textContent = text;
+      count.classList.toggle('is-near', left >= 0 && left <= 8);
+      count.classList.toggle('is-over', left < 0);
+      good.classList.toggle('is-error', left < 0);
+      // 视觉上实时更新；读屏等用户停手再播，免得每个字都被打断
+      clearTimeout(speak);
+      speak = setTimeout(() => { live.textContent = text; }, 700);
+    }
+
+    good.addEventListener('input', paint);
+    bad.addEventListener('input', () => {
+      badNote.textContent = `${len(bad.value)} / 40 · 到上限后再敲不进去`;
+      badNote.className = 'counter';
+    });
+
+    $('#ccPaste').addEventListener('click', () => {
+      const long = '做了六年前端，最近两年专注设计系统和无障碍，平时也写一点工具脚本，最想让你记住的是：每个组件上线前我都会用键盘完整走一遍。';
+      good.value = long;
+      paint();
+      // 直接给 .value 赋值不会触发 maxlength，这里模拟浏览器对「粘贴」的截断
+      const kept = Array.from(long).slice(0, 40).join('');
+      bad.value = kept;
+      const lost = len(long) - len(kept);
+      badNote.textContent = `粘贴了 ${len(long)} 字，只留下 40 字 —— 最后 ${lost} 字被静默丢掉，真实浏览器里连这行提示都没有`;
+      badNote.className = 'counter is-over';
+    });
+
+    paint();
+  }
+
+  /* ------------------------------------------------------------
      20. Search input —— 防抖
      ------------------------------------------------------------ */
 
@@ -1011,6 +1159,8 @@
     initDropzone();
     initSlider();
     initSpinbutton();
+    initDateInput();
+    initCharCount();
     initSearchInput();
     initSubmitButton();
   }

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "node scripts/serve.mjs",
-    "check": "node --check app.js && node --check forms.js && node --check scripts/serve.mjs && node --check playwright.config.mjs",
+    "check": "node --check app.js && node --check forms.js && node --check nav.js && node --check scripts/serve.mjs && node --check playwright.config.mjs",
     "test:e2e": "playwright test"
   },
   "devDependencies": {

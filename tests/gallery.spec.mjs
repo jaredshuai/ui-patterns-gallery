@@ -78,18 +78,25 @@ test('卷一：遮罩关闭后不会拦住触发按钮', async ({ page }) => {
   }
 });
 
-test('卷一：Alert dialog 只能用按钮关，Modal 点遮罩能关', async ({ page }) => {
+test('卷一：Alert dialog 点遮罩不关、Esc 等于取消，Modal 点遮罩能关', async ({ page }) => {
   await page.goto('/#alert-dialog');
 
   await page.locator('#alertOpen').click();
   await expect(page.locator('#alertBox')).toHaveClass(/is-open/);
-
-  await page.keyboard.press('Escape');
-  await expect(page.locator('#alertBox')).toHaveClass(/is-open/);
+  // 初始焦点在「取消」上，手滑按回车不会误删
+  await expect(page.locator('#alertBox [data-close="alert"]')).toBeFocused();
 
   await page.locator('#alertScrim').click({ position: { x: 6, y: 6 } });
   await expect(page.locator('#alertBox')).toHaveClass(/is-open/);
 
+  // Esc 能关，但只能落到「取消」上，焦点回到触发按钮
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#alertBox')).not.toHaveClass(/is-open/);
+  await expect(page.locator('#alertResult')).toContainText('已取消');
+  await expect(page.locator('#alertResult')).not.toContainText('永久删除');
+  await expect(page.locator('#alertOpen')).toBeFocused();
+
+  await page.locator('#alertOpen').click();
   await page.locator('#alertBox [data-close="alert"]').first().click();
   await expect(page.locator('#alertBox')).not.toHaveClass(/is-open/);
   await expect(page.locator('#alertResult')).toContainText('已取消');
@@ -604,6 +611,211 @@ test.describe('移动端', () => {
     await page.locator('#hoverAnchor').tap();
     await expect(box).not.toHaveClass(/is-open/, { timeout: 2_000 });
   });
+});
+
+test('卷二：aria-disabled 要自己拦输入，原生复选框不叠 aria-checked', async ({ page }) => {
+  await page.goto('/#disabled-states');
+  const aria = page.locator('#dsAria');
+  const before = await aria.inputValue();
+  await aria.focus();
+  await expect(aria).toBeFocused();
+  await page.keyboard.type('XYZ');
+  await expect(aria).toHaveValue(before);
+
+  await page.goto('/#checkbox');
+  await page.locator('.child-check').nth(1).check();
+  await expect(page.locator('#checkAll')).toHaveJSProperty('indeterminate', true);
+  expect(await page.locator('#checkAll').getAttribute('aria-checked')).toBeNull();
+});
+
+test('卷二：日期三栏不自动跳格，能识别不存在的日期；原生日期提交 yyyy-mm-dd', async ({ page }) => {
+  await page.goto('/#date-input');
+  await page.locator('#dobD').fill('30');
+  // 不自动跳格：填满两位后焦点仍在「日」上
+  await expect(page.locator('#dobD')).toBeFocused();
+  await page.locator('#dobM').fill('2');
+  await page.locator('#dobY').fill('1990');
+  await page.locator('#tripDate').focus();
+  await expect(page.locator('#dobOut')).toContainText('真实存在');
+  await expect(page.locator('#dobD')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#dobY')).not.toHaveAttribute('aria-invalid', 'true');
+
+  // 失焦过一次之后转为实时
+  await page.locator('#dobD').fill('28');
+  await expect(page.locator('#dobOut')).toContainText('1990 年 2 月 28 日');
+
+  await page.locator('#dobM').fill('');
+  await expect(page.locator('#dobOut')).toContainText('还缺月');
+  await expect(page.locator('#dobM')).toHaveAttribute('aria-invalid', 'true');
+  await expect(page.locator('#dobD')).not.toHaveAttribute('aria-invalid', 'true');
+
+  await page.locator('#tripDate').fill('2026-11-12');
+  await expect(page.locator('#tripOut')).toContainText('2026-11-12（星期四）');
+});
+
+test('卷二：字数统计超出只提醒不截断，maxlength 会静默截断', async ({ page }) => {
+  await page.goto('/#character-count');
+  await page.locator('#ccGood').fill('短');
+  await expect(page.locator('#ccGoodCount')).toContainText('还可以输入 39 个字');
+
+  await page.locator('#ccPaste').click();
+  const good = await page.locator('#ccGood').inputValue();
+  expect([...good].length).toBeGreaterThan(40);
+  await expect(page.locator('#ccGoodCount')).toContainText('超出');
+  await expect(page.locator('#ccGoodCount')).toHaveClass(/is-over/);
+  expect([...(await page.locator('#ccBad').inputValue())].length).toBe(40);
+  // 读屏播报是延迟的，停手后才播
+  await expect(page.locator('#ccGoodLive')).toContainText('超出', { timeout: 3_000 });
+});
+
+test('卷三：Tabs 方向键切换、Tab 键只停在当前标签', async ({ page }) => {
+  await page.goto('/#tabs');
+  await expect(page.locator('#vol-nav')).toBeVisible();
+  const tabs = page.locator('#stage-tabs [role="tab"]');
+  await tabs.nth(0).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(tabs.nth(1)).toBeFocused();
+  await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
+  await expect(page.locator('#panel-mb')).toBeVisible();
+  await expect(page.locator('#panel-ov')).toBeHidden();
+
+  await page.keyboard.press('ArrowLeft');
+  await page.keyboard.press('ArrowLeft');
+  await expect(tabs.nth(2)).toBeFocused();
+  await page.keyboard.press('Home');
+  await expect(tabs.nth(0)).toHaveAttribute('aria-selected', 'true');
+
+  // 只有当前标签在 Tab 顺序里；下一次 Tab 落到面板
+  expect(await tabs.evaluateAll(ts => ts.map(t => t.tabIndex))).toEqual([0, -1, -1]);
+  await page.keyboard.press('Tab');
+  await expect(page.locator('#panel-ov')).toBeFocused();
+
+  await tabs.nth(2).click();
+  await expect(page.locator('#panel-st')).toBeVisible();
+});
+
+test('卷三：手风琴默认只能开一个，勾选后可同时展开', async ({ page }) => {
+  await page.goto('/#accordion');
+  const items = page.locator('#accList details');
+  await expect(items.nth(0)).toHaveJSProperty('open', true);
+  await items.nth(1).locator('summary').click();
+  await expect(items.nth(1)).toHaveJSProperty('open', true);
+  await expect(items.nth(0)).toHaveJSProperty('open', false);
+
+  await page.locator('#accMulti').check();
+  await items.nth(2).locator('summary').click();
+  await expect(items.nth(1)).toHaveJSProperty('open', true);
+  await expect(items.nth(2)).toHaveJSProperty('open', true);
+
+  // 键盘也能展开
+  await items.nth(0).locator('summary').focus();
+  await page.keyboard.press('Enter');
+  await expect(items.nth(0)).toHaveJSProperty('open', true);
+});
+
+test('卷三：分页有当前页语义，到头时焦点不丢', async ({ page }) => {
+  await page.goto('/#pagination');
+  const nav = page.locator('#pgNav');
+  await expect(nav.locator('[aria-current="page"]')).toHaveText('1');
+  await expect(nav.locator('[data-go="prev"]')).toBeDisabled();
+  await expect(page.locator('#pgStatus')).toContainText('第 1–5 条，共 47 条');
+
+  await nav.locator('[data-go="10"]').click();
+  await expect(nav.locator('[aria-current="page"]')).toHaveText('10');
+  await expect(page.locator('#pgStatus')).toContainText('第 46–47 条');
+  await expect(page.locator('#pgList .pg-row')).toHaveCount(2);
+
+  await nav.locator('[data-go="prev"]').click();
+  await expect(nav.locator('[data-go="prev"]')).toBeFocused();
+  await page.keyboard.press('Enter');
+  await expect(nav.locator('[aria-current="page"]')).toHaveText('8');
+  await expect(nav.locator('.pg__gap')).toHaveCount(1);
+
+  // 用键盘连按「下一页」到末页：按钮被禁用后焦点落到当前页码，而不是丢到 body
+  await nav.locator('[data-go="next"]').focus();
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter');
+  await expect(nav.locator('[data-go="next"]')).toBeDisabled();
+  await expect(nav.locator('[aria-current="page"]')).toBeFocused();
+});
+
+test('卷三：加载更多与无限滚动都能加载到底', async ({ page }) => {
+  await page.goto('/#infinite-scroll');
+  const rows = page.locator('#feedList .feed__row');
+  await expect(rows).toHaveCount(10);
+
+  // 加载中再点会被忽略（防重复加载），所以每次等这一批到了再点下一次
+  for (let n = 20; n <= 40; n += 10) {
+    await page.locator('#feedMore').click();
+    await expect(rows).toHaveCount(n);
+  }
+  await expect(page.locator('#feedFoot')).toContainText('已经到底了');
+  await expect(page.locator('#feedStatus')).toContainText('已加载 40 / 40');
+
+  await page.locator('[data-feed="auto"]').click();
+  await expect(rows).toHaveCount(10);
+  await page.locator('#feedBox').evaluate(el => { el.scrollTop = el.scrollHeight; });
+  await expect(rows).toHaveCount(20, { timeout: 3_000 });
+});
+
+test('卷三：分步表单要先过校验、能回头且不丢内容、不能跳到没走过的步', async ({ page }) => {
+  await page.goto('/#stepper');
+  const steps = page.locator('#stepsBar .steps__btn');
+
+  await page.locator('#wzNext').click();
+  await expect(page.locator('#wzMailMsg')).toContainText('请填写邮箱');
+  await expect(page.locator('#wzMail')).toBeFocused();
+
+  // 还没走到的第 3 步点不过去（aria-disabled 仍可聚焦可点，所以要 force 去点，验证代码真的拦住了）
+  await steps.nth(2).click({ force: true });
+  await expect(page.locator('.wiz__step[data-step="0"]')).toBeVisible();
+  await expect(steps.nth(2)).toHaveAttribute('aria-disabled', 'true');
+
+  await page.locator('#wzMail').fill('lin@example.com');
+  await page.keyboard.press('Enter');
+  await expect(page.locator('.wiz__step[data-step="1"]')).toBeVisible();
+  await expect(page.locator('.wiz__step[data-step="1"] .wiz__title')).toBeFocused();
+  await expect(steps.nth(1)).toHaveAttribute('aria-current', 'step');
+
+  await page.locator('#wzName').fill('知远');
+  await page.locator('#wzBack').click();
+  await expect(page.locator('#wzMail')).toHaveValue('lin@example.com');
+  await steps.nth(1).click();
+  await expect(page.locator('#wzName')).toHaveValue('知远');
+
+  await page.locator('#wzNext').click();
+  await expect(page.locator('#wzSum')).toContainText('lin@example.com');
+  await page.locator('#wzNext').click();
+  await expect(page.locator('#wzSum')).toContainText('已提交');
+});
+
+test('全站：导语里的数量、索引与页面条目一致', async ({ page }) => {
+  await page.goto('/');
+  for (const vol of ['overlay', 'form', 'nav']) {
+    await page.locator(`.volsw__btn[data-vol="${vol}"]`).click();
+    const r = await page.evaluate(v => {
+      const specs = [...document.querySelectorAll('.spec')].filter(s => (s.dataset.vol || 'overlay') === v);
+      const links = [...document.querySelectorAll('#index .index__link')].map(a => a.dataset.target);
+      return {
+        lede: Number(document.querySelector(`[data-count="${v}"]`).textContent),
+        specs: specs.length,
+        missingFromIndex: specs.map(s => s.id).filter(id => !links.includes(id)),
+        brokenLinks: links.filter(id => !document.getElementById(id)),
+        masthead: document.getElementById('count').textContent,
+      };
+    }, vol);
+    expect(r.lede, vol + ' 导语数量').toBe(r.specs);
+    expect(r.missingFromIndex, vol + ' 没进索引的条目').toEqual([]);
+    expect(r.brokenLinks, vol + ' 索引里指向不存在条目').toEqual([]);
+    expect(r.masthead).toContain(`${r.specs} 项`);
+  }
+
+  // 卷三的控件热区也要够大
+  const small = await page.evaluate(() => [...document.querySelectorAll('#vol-nav .stage button, #vol-nav .stage summary')]
+    .map(el => [el.id || el.className, el.getBoundingClientRect()])
+    .filter(([, r]) => r.width && r.height && (r.width < 24 || r.height < 24))
+    .map(([n, r]) => [n, Math.round(r.width), Math.round(r.height)]));
+  expect(small).toEqual([]);
 });
 
 test('打开首页停在顶部，不会被隐藏的命令面板拽走', async ({ page }) => {

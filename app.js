@@ -27,8 +27,9 @@
 
   /* 分卷：每组属于哪一卷 */
   const VOLUMES = {
-    overlay: { btn: '卷一 · 浮层', short: '浮层' },
-    form: { btn: '卷二 · 表单', short: '表单' },
+    overlay: { btn: '卷一 · 浮层', short: '浮层', placeholder: '搜索 toast、遮罩、确认…', hint: '试试 toast、遮罩 或 确认。' },
+    form: { btn: '卷二 · 表单', short: '表单', placeholder: '搜索 select、校验、只读…', hint: '试试 select、校验 或 日期。' },
+    nav: { btn: '卷三 · 导航', short: '导航', placeholder: '搜索 tabs、分页、步骤…', hint: '试试 tabs、分页 或 手风琴。' },
   };
 
   const GROUPS = [
@@ -39,9 +40,12 @@
     { vol: 'overlay', name: '引导', ids: ['tour', 'coachmark'] },
 
     { vol: 'form', name: '选择控件', ids: ['select', 'combobox', 'radio-group', 'segmented-control', 'switch', 'checkbox'] },
-    { vol: 'form', name: '输入与文本', ids: ['placeholder', 'password-input', 'search-input', 'otp-input', 'slider', 'spinbutton'] },
+    { vol: 'form', name: '输入与文本', ids: ['placeholder', 'password-input', 'search-input', 'otp-input', 'slider', 'spinbutton', 'date-input', 'character-count'] },
     { vol: 'form', name: '校验与反馈', ids: ['validation-timing', 'error-summary', 'required-marker', 'autosave', 'dirty-state'] },
     { vol: 'form', name: '状态与提交', ids: ['disabled-states', 'optimistic-ui', 'submit-button', 'dropzone'] },
+
+    { vol: 'nav', name: '内容组织', ids: ['tabs', 'accordion'] },
+    { vol: 'nav', name: '翻页与流程', ids: ['pagination', 'infinite-scroll', 'stepper'] },
   ];
 
   let currentVol = 'overlay';
@@ -70,6 +74,13 @@
     const n = specsIn(currentVol).length;
     const g = groupsIn(currentVol).length;
     $('#count').textContent = `${n} 项 / ${g} 组`;
+  }
+
+  // 导语里的「N 个概念」按页面上实际的条目数填，加减条目不用再手改数字
+  function fillLedeCounts() {
+    $$('[data-count]').forEach(b => {
+      b.textContent = String(specsIn(b.dataset.count).length);
+    });
   }
 
   let io = null;
@@ -148,6 +159,8 @@
 
     buildIndex();
     setCount();
+    // 锚点跳到另一卷时也要换占位和提示，不只是点卷别按钮
+    setSearchPlaceholder();
 
     // 清掉另一卷残留的搜索过滤
     const input = $('#search');
@@ -174,13 +187,14 @@
     });
   }
 
-  // 搜索框占位随卷变化
+  // 搜索框占位和「没有结果」的提示随卷变化
   function setSearchPlaceholder() {
     const input = $('#search');
-    if (!input) return;
-    input.placeholder = currentVol === 'overlay'
-      ? '搜索 toast、遮罩、确认…'
-      : '搜索 select、校验、只读…';
+    const v = VOLUMES[currentVol];
+    if (!input || !v) return;
+    input.placeholder = v.placeholder;
+    const hint = $('#noResultHint');
+    if (hint) hint.textContent = v.hint;
   }
 
   // 窄屏目录：左栏索引在 1080px 以下是隐藏的，这里把同一份索引浮出来，不另维护一份
@@ -806,7 +820,7 @@
   }
 
   function makeOverlay(opts) {
-    const { stage, scrim, box, trigger, onOpen, onClose, escCloses = true, outsideCloses = true, initialFocus = null } = opts;
+    const { stage, scrim, box, trigger, onOpen, onClose, escCloses = true, outsideCloses = true, initialFocus = null, onEsc = null } = opts;
 
     let open = false;
     let lastFocus = null;
@@ -856,7 +870,8 @@
 
     trapTab(box, () => open);
 
-    const api = { show, hide, isOpen: () => open, escCloses, stage, onEsc: escCloses ? hide : null };
+    // onEsc 让浮层自己决定 Esc 的含义（Alert dialog 把它当作「取消」），默认就是关闭
+    const api = { show, hide, isOpen: () => open, escCloses, stage, onEsc: escCloses ? (onEsc || hide) : null };
     return api;
   }
 
@@ -867,7 +882,7 @@
     if (!top) return;
     if (top.escCloses) {
       e.preventDefault();
-      top.hide();
+      top.onEsc();
     } else {
       // 明确吃掉这次 Esc：下面的浮层也不该被关掉
       e.preventDefault();
@@ -902,32 +917,30 @@
     if (!stage) return;
     const result = $('#alertResult');
 
+    // 关键：点外面关不掉；Esc 能关，但只能落到「取消」上（WAI-ARIA APG 与 Radix AlertDialog 的行为）
+    const cancel = how => {
+      ov.hide();
+      result.textContent = `已取消${how}，什么都没删除。`;
+    };
+
     const ov = makeOverlay({
       stage,
       scrim: $('#alertScrim'),
       box: $('#alertBox'),
       trigger: $('#alertOpen'),
-      escCloses: false,      // 关键：Esc 关不掉
-      outsideCloses: false,  // 点外面也关不掉
+      outsideCloses: false,
       initialFocus: '[data-close="alert"]',
       onOpen: () => { result.textContent = ''; },
+      onEsc: () => cancel('（Esc）'),
     });
 
     $$('[data-close="alert"]').forEach(b => {
-      b.addEventListener('click', () => {
-        ov.hide();
-        result.textContent = '已取消，什么都没删除。';
-      });
+      b.addEventListener('click', () => cancel(''));
     });
 
     $('#alertConfirm').addEventListener('click', () => {
       ov.hide();
       result.textContent = '已永久删除。';
-    });
-
-    // Esc 在这里毫无反应 —— 这正是演示的重点
-    stage.addEventListener('keydown', e => {
-      if (e.key === 'Escape' && ov.isOpen()) e.stopPropagation();
     });
 
     overlays.alert = ov;
@@ -1752,6 +1765,7 @@
     }
     setVolume(startVol, { silent: true });
     setSearchPlaceholder();
+    fillLedeCounts();
 
     initToast();
     initSnackbar();
